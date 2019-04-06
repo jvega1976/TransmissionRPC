@@ -13,7 +13,7 @@ FOUNDATION_EXPORT const unsigned char ___TARGETNAME:c99ExtIdentifier___VersionSt
 #import <TransmissionRPC/RPCConfigValues.h>
 #import <TransmissionRPC/TRInfos.h>
 #import <TransmissionRPC/TRInfo.h>
-#import <TransmissionRPC/TRSessionInfo.h>
+#import <TransmissionRPC/<TransmissionRPC/TransmissionRPC.h>>
 #import <TransmissionRPC/TRPeerInfo.h>
 #import <TransmissionRPC/TRFileInfo.h>
 #import <TransmissionRPC/TrackerStat.h>

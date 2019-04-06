@@ -72,7 +72,7 @@
      Common Standard Share Connection (singleton)
      @return a common RPCConnector available for use through multiple interface components
  */
-+ (RPCConnector*)shared;
++ (RPCConnector*)sharedConnector;
 
 
 /*!

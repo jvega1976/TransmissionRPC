@@ -1085,7 +1085,7 @@
 }
 
 
-+ (RPCConnector*)shared {
++ (RPCConnector*)sharedConnector {
     
     static RPCConnector* _inst;
     
