@@ -978,8 +978,10 @@
     {
         // code goes here
         if( error )
-        {
-            [self sendErrorMessage:[NSString stringWithFormat:@"%@ - %@", error.localizedDescription,requestDict[@"ids"]] toDelegateWithRequestMethodName:requestName];
+        {   NSMutableString *message = [NSMutableString stringWithFormat:@"%@",error.localizedDescription];
+            if(requestDict[@"ids"])
+                [message appendFormat:@" - %@",requestDict[@"ids"]];
+            [self sendErrorMessage:message fromURL:req.URL toDelegateWithRequestMethodName:requestName];
         }
         else
         {
@@ -1001,7 +1003,7 @@
                         return;
                     }
                     
-                    [self sendErrorMessage:[NSString stringWithFormat:@"%li %@", (long)statusCode, self.lastErrorMessage]
+                    [self sendErrorMessage:[NSString stringWithFormat:@"%li %@", (long)statusCode, self.lastErrorMessage] fromURL:req.URL
                           toDelegateWithRequestMethodName:requestName];
                 }
                 else
@@ -1011,7 +1013,7 @@
                     NSDictionary *ansJSON = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
                     if( !ansJSON )
                     {
-                        [self sendErrorMessage:NSLocalizedString(@"Server response wrong data", @"")
+                        [self sendErrorMessage:NSLocalizedString(@"Server response wrong data", @"") fromURL:req.URL
                               toDelegateWithRequestMethodName:requestName];
                     }
                     // JSON is OK, trying to retrieve result of request it should be TR_RESULT_SUCCEED
@@ -1020,18 +1022,19 @@
                         NSString *result =  ansJSON[TR_RESULT];
                         if( !result )
                         {
-                            [self sendErrorMessage:NSLocalizedString(@"Server failed to return data", @"")
+                            [self sendErrorMessage:NSLocalizedString(@"Server failed to return data", @"") fromURL:req.URL
                                   toDelegateWithRequestMethodName:requestName];
                         }
                         else if( ![result isEqualToString: TR_RESULT_SUCCEED] )
                         {
-                            [self sendErrorMessage:[NSString stringWithFormat:NSLocalizedString(@"Server failed to return data: %@", @""), result]
+                            [self sendErrorMessage:[NSString stringWithFormat:NSLocalizedString(@"Server failed to return data: %@", @""), result] fromURL:req.URL
                                   toDelegateWithRequestMethodName:requestName];
                         }
                         else
                         {
                             // server returned SUCCESS
-                            dataHandler( ansJSON );
+                            if(self->_task.state != NSURLSessionTaskStateCanceling && req.URL == self.url)
+                                dataHandler( ansJSON );
                         }
                     }
                 }
@@ -1048,20 +1051,21 @@
         [_task cancel];
 }
 
-- (void)sendErrorMessage:(NSString*)message toDelegateWithRequestMethodName:(NSString*)methodName
+- (void)sendErrorMessage:(NSString*)message fromURL:(NSURL*)url toDelegateWithRequestMethodName:(NSString*)methodName
 {
     _lastErrorMessage = message;
-    if( self.delegate && [self.delegate respondsToSelector:@selector(connector:complitedRequestName:withError:)])
+    if( self.delegate && [self.delegate respondsToSelector:@selector(connector:complitedRequestName:fromURL:withError:)])
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate connector:self complitedRequestName:methodName withError:message ];
+            [self.delegate connector:self complitedRequestName:methodName fromURL:url withError:message ];
         });
     }
 }
 
 
-- (void)setURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate
+- (void)initWithURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate
 {
+    [self stopRequests];
     _url = url;
     _delegate = delegate;
     _requestTimeout = timeout;
@@ -1097,21 +1101,31 @@
     return _inst;
 }
 
-+ (RPCConnector*)init {
-    RPCConnector *connector = [[RPCConnector alloc] init];
-    return connector;
-}
 
-// close init method
-- (instancetype)init
+- (instancetype)initWithtURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate
 {
     self = [super init];
-    
-    if( self )
-    {
-    _sessionInfo = [[TRSessionInfo alloc] init];
+    if(self) {
+        _url = url;
+        _delegate = delegate;
+        _requestTimeout = timeout;
+        
+        // create nsurlsession with our config parameters
+        NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+        sessionConfig.timeoutIntervalForRequest = _requestTimeout;
+        
+        _session = [NSURLSession sessionWithConfiguration:sessionConfig];
+        
+        // add auth header if there is username
+        _authString = nil;
+        if( _url.user )
+        {
+            NSString *authStringToEncode64 = [NSString stringWithFormat:@"%@:%@", _url.user, _url.password];
+            NSData *data = [authStringToEncode64 dataUsingEncoding:NSUTF8StringEncoding];
+            _authString = [NSString stringWithFormat:@"Basic %@", [data base64EncodedStringWithOptions:0]];
+        }
+        _delegate = nil;
     }
-    
     return self;
 }
 

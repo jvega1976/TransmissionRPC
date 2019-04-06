@@ -18,7 +18,7 @@
 
 @protocol RPCConnectorDelegate <NSObject>
 
-@optional - (void)connector:(RPCConnector *)cn complitedRequestName:(NSString*)requestName withError:(NSString*)errorMessage;
+@optional - (void)connector:(RPCConnector *)cn complitedRequestName:(NSString*)requestName fromURL:(NSURL*)url withError:(NSString*)errorMessage;
 @optional - (void)gotAllTorrents:(TRInfos *)trInfos;
 @optional - (void)gotTorrentDetailedInfo:(TRInfo*)torrentInfo;
 @optional - (void)gotTorrentStopped;
@@ -60,12 +60,25 @@
 @property (nonatomic) int requestTimeout;
 @property (strong, nonatomic) TRSessionInfo *sessionInfo;
 
+
 /*!
- Class type initializer (singleton)
- @return empty initialized RPCConnector instance
+ Method to update the RPCConnector properties.  Mainly used to initialize the shared connector.
+ @param url - NSURL object with connection session information
+ @param timeout - session request timeout (in seconds)
+ @param delegate - delegate for RPCconnector
+ */
+- (void)initWithURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate;
+
+
+/*!
+ Object instance initializer
+ @param url - NSURL object with connection session information
+ @param timeout - session request timeout (in seconds)
+ @param delegate - delegate for RPCconnector
+ @return RPCConnector instance initialized with session configuration according to passed parameters values
  */
 
-+ (RPCConnector*)init;
+- (instancetype)initWithtURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate;
 
 
 /*!
@@ -74,14 +87,6 @@
  */
 + (RPCConnector*)sharedConnector;
 
-
-/*!
-    Method to update the shared RPCConnector
-    @param url - NSURL object with connection session information
-    @param timeout - session request timeout (in seconds)
-    @param delegate - delegate for RPCconnector
- */
-- (void)setURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate;
 
 /*!
  Method to request information for all Torrents.  You must implement the gotAllTorrents method of the RPCConnectorDelegate protocol to obtain the returned Torrents info.
@@ -114,7 +119,7 @@
 
 /*!
     Method to stop the current action (download, seed, wait, etc.) for a collection of Torrents.  Optionally, you can implement the gotTorrentsStopped method of the RPCConnectorDelegate protocol to take any action necessary action after the request was completed.
-    @param torrenstId - Array of Torrents Ids to request the stop action
+ @param torrentsId - Array of Torrents Ids to request the stop action
  */
 - (void)stopTorrents:(NSArray*)torrentsId;
 

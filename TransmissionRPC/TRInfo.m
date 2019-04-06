@@ -276,15 +276,23 @@
                                     _uploadedEverString,
                                     _uploadRatio];
             }
-            if( _status == TR_STATUS_CHECK || _status == TR_STATUS_CHECK_WAIT )
+            if( _status == TR_STATUS_CHECK)
             {
                 _isChecking = YES;
                 _statusString = NSLocalizedString(@"trChecking", @"");
                 _progressPercent = _recheckProgress;
                 _progressPercentString = [NSString stringWithFormat:@"%f", _recheckProgress];
             }
-            
-            if ( _status == TR_STATUS_SEED || _status == TR_STATUS_SEED_WAIT )
+            if(_status == TR_STATUS_CHECK_WAIT) {
+                _isWaiting = YES;
+                 _statusString = NSLocalizedString(@"trWaitingCheck", @"");
+            }
+            if(_status == TR_STATUS_SEED_WAIT ){
+                _isWaiting = YES;
+                _statusString = NSLocalizedString(@"trWaitingSeed", @"");
+            }
+                
+            if ( _status == TR_STATUS_SEED)
             {
                 _isSeeding = YES;
                 _statusString = NSLocalizedString(@"trSeeding", @"");
