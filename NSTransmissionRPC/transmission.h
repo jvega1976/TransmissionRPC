@@ -32,7 +32,7 @@ extern "C"
 
 
 #include "tr-macros.h"
-
+    
 typedef uint32_t tr_file_index_t;
 typedef uint32_t tr_piece_index_t;
 /* assuming a 16 KiB block, a 32-bit block index gives us a maximum torrent size of 63 TiB.

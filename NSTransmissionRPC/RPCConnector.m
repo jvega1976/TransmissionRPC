@@ -241,7 +241,7 @@
 
 
 - (void)getAllPeersForTorrentWithId:(int)torrentId
-{
+{   __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -262,15 +262,15 @@
          
          TRPeerStat *peerStat = [TRPeerStat peerStatWithJSONData:[torrentsJsonDesc firstObject][TR_ARG_FIELDS_PEERSFROM]];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllPeers:withPeerStat:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAllPeers:withPeerStat:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllPeers:peerInfos withPeerStat:peerStat forTorrentWithId:torrentId];
+                 [delegate gotAllPeers:peerInfos withPeerStat:peerStat forTorrentWithId:torrentId];
              });
      }];
 }
 
 - (void)getAllFilesForTorrentWithId:(int)torrentId
-{
+{   __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -302,15 +302,15 @@
          
          [fsDir sort];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllFiles:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAllFiles:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllFiles:fsDir forTorrentWithId:torrentId];
+                 [delegate gotAllFiles:fsDir forTorrentWithId:torrentId];
              });
      }];    
 }
 
 - (void)getAllFileStatsForTorrentWithId:(int)torrentId
-{
+{   __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{ TR_ARG_FIELDS : @[ TR_ARG_FIELDS_FILESTATS], TR_ARG_IDS : @[@(torrentId)] }
@@ -330,9 +330,9 @@
              [res addObject:fileStat];
          }
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllFileStats:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAllFileStats:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllFileStats:res forTorrentWithId:torrentId];
+                 [delegate gotAllFileStats:res forTorrentWithId:torrentId];
              });
      }];
 }
@@ -367,7 +367,7 @@
 }
 
 - (void)getPiecesBitMapForTorrent:(int)torrentId
-{
+{   __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -385,9 +385,9 @@
  
          NSData *data = [[NSData alloc] initWithBase64EncodedString:base64data options:NSDataBase64DecodingIgnoreUnknownCharacters];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotPiecesBitmap:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotPiecesBitmap:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotPiecesBitmap:data forTorrentWithId:torrentId];
+                 [delegate gotPiecesBitmap:data forTorrentWithId:torrentId];
              });
      }];
 }
@@ -814,7 +814,7 @@
 }
 
 - (void)getSessionInfo
-{
+{   __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONGET };
     
     [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONGET andHandler:^(NSDictionary *json)
@@ -824,15 +824,15 @@
         TRSessionInfo *sessionInfo = [TRSessionInfo sharedTRSessionInfo];
         
         self->_sessionInfo = sessionInfo;
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotSessionWithInfo:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotSessionWithInfo:)])
                       dispatch_async(dispatch_get_main_queue(), ^{
-                          [self.delegate gotSessionWithInfo:sessionInfo];
+                          [delegate gotSessionWithInfo:sessionInfo];
                       });
     }];    
 }
 
 - (void)getSessionStats
-{
+{   __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONSTATS };
     
     [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONSTATS andHandler:^(NSDictionary *json)
@@ -840,9 +840,9 @@
          NSDictionary *sessionJSON = json[TR_RETURNED_ARGS];
          TRSessionStats *sessionStats = [TRSessionStats sessionStatsFromJSON:sessionJSON];
 
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotSessionWithStats:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotSessionWithStats:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotSessionWithStats:sessionStats];
+                 [delegate gotSessionWithStats:sessionStats];
              });
      }];
 }
@@ -918,6 +918,7 @@
 
 - (void)getFreeSpaceWithDownloadDir:(NSString *)downloadDir
 {
+    __strong typeof(self.delegate) delegate = _delegate;
     NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_FREESPACE,
                                   TR_METHOD_ARGS : @{ TR_ARG_FREESPACEPATH : downloadDir } };
     
@@ -929,9 +930,9 @@
          formatter.allowsNonnumericFormatting = NO;
          NSString* freeSizeString = [formatter stringFromByteCount:freeSizeBytes];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotFreeSpaceString:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotFreeSpaceString:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotFreeSpaceString:freeSizeString];
+                 [delegate gotFreeSpaceString:freeSizeString];
              });
      }];
 }

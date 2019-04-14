@@ -7,7 +7,7 @@
 //
 
 #import <XCTest/XCTest.h>
-#import <TransmissionRPC/TransmissionRPC.h>
+#import <NSTransmissionRPC/NSTransmissionRPC.h>
 
 @interface TransmissionRPCTests : XCTestCase <RPCConnectorDelegate>
 @property RPCConnector *connector;
