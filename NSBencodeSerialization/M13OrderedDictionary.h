@@ -13,9 +13,9 @@
 
 /**A cross between NSDictionary and NSArray.
  @note Terminolgy:
- Entry - refers to an object-key pair.
- Object - refers to (id), with an index, and an assocoated key.
- Key - refers to <(id)NSCopying>, with an associated object.
+ entry - refers to an object-key pair.
+ object - refers to (id), with an index, and an assocoated key.
+ key - refers to <(id)NSCopying>, with an associated object.
  
  Each method at the end of its corresponding description will indicate what object (NSArray, NSDictionary) which that method is drawn from, so it is easier to find a longer description of what the method does.*/
 @interface M13OrderedDictionary : NSObject <NSCopying, NSFastEnumeration, NSCoding>
@@ -126,7 +126,7 @@
 - (NSDictionary *)entryAtIndex:(NSUInteger)index;
 
 /**The array containing the objects at the given index set.
- @param indices The indices to retreive the objects from.
+ @param indeces The indeces to retreive the objects from.
  @return The array containing the objects at the given index set.*/
 - (NSArray *)objectsAtIndices:(NSIndexSet *)indeces;
 /**The array containing the keys at the given index set.
@@ -153,7 +153,7 @@
  @return The array containing the keys corresponding to all occurrences of a given object in the ordered dictionary.*/
 - (NSArray *)allKeysForObject:(id)anObject;
 /**The value associated with a given key.
- @param The key to get the object for.
+ @param key  the key  to get the object for.
  @return he value associated with the given key.*/
 - (id)objectForKey:(id<NSCopying>)key;
 /**The set of objects from the orderedDictionary that corresponds to the specified keys as an NSArray.
@@ -352,15 +352,15 @@
 
 /**@name Comparing*/
 /**Returns the first object contained in the receiving orderedDictionary that’s equal to an object in the given ordered dictionary.
- @param orderedDictionary The orderedDictionary to compare to.
+ @param otherOrderedDictionary The orderedDictionary to compare to.
  @return The first object contained in the receiving orderedDictionary that’s equal to an object in the given ordered dictionary.*/
 - (id)firstObjectInCommonWithOrderedDictionary:(M13OrderedDictionary *)otherOrderedDictionary;
 /**Returns the first key contained in the receiving orderedDictionary that’s equal to a key in the given ordered dictionary.
- @param orderedDictionary The orderedDictionary to compare to.
+ @param otherOrderedDictionary The orderedDictionary to compare to.
  @return The first key contained in the receiving orderedDictionary that’s equal to a key in the given ordered dictionary.*/
 - (id)firstKeyInCommonWithOrderedDictionary:(M13OrderedDictionary *)otherOrderedDictionary;
 /**Returns the first entry contained in the receiving orderedDictionary that’s equal to an entry in the given ordered dictionary.
- @param orderedDictionary The orderedDictionary to compare to.
+ @param otherOrderedDictionary The orderedDictionary to compare to.
  @return The first entry contained in the receiving orderedDictionary that’s equal to an entry in the given ordered dictionary.*/
 - (id)firstEntryInCommonWithOrderedDictionary:(M13OrderedDictionary *)otherOrderedDictionary;
 
@@ -416,13 +416,13 @@
 /**Returns a new orderedDictionary that lists the receiving orderedDictionary objects in ascending order as defined by the comparison function comparator.
  @param comparator The comparator to perform the sorting operation with.
  @param context The context to sort the objects in.
- @param hit The sorting hint to speed sorting.
+ @param hint The sorting hint to speed sorting.
  @return  A new orderedDictionary that lists the receiving orderedDictionary objects in ascending order as defined by the comparison function comparator.*/
 - (M13OrderedDictionary *)sortedByObjectsUsingFunction:(NSInteger (*)(id, id, void *))comparator context:(void *)context hint:(NSData *)hint;
 /**Returns a new orderedDictionary that lists the receiving orderedDictionary keys in ascending order as defined by the comparison function comparator.
  @param comparator The comparator to perform the sorting operation with.
  @param context The context to sort the objects in.
- @param hit The sorting hint to speed sorting.
+ @param hint The sorting hint to speed sorting.
  @return  A new orderedDictionary that lists the receiving orderedDictionary keys in ascending order as defined by the comparison function comparator.*/
 - (M13OrderedDictionary *)sortedByKeysUsingFunction:(NSInteger (*)(id<NSCopying>, id<NSCopying>, void *))comparator context:(void *)context hint:(NSData *)hint;
 
@@ -475,7 +475,7 @@
 - (NSString *)descriptionWithLocale:(id)locale;
 /**Returns the contents formatted as a property list.
  @param locale The local to format the property list with.
- @param indent The indentation level of the property list.
+ @param level The indentation level of the property list.
  @return The contents formatted as a property list.*/
 - (NSString *)descriptionWithLocale:(id)locale indent:(NSUInteger)level;
 /**Writes contents to file at a given path.
@@ -496,7 +496,7 @@
  @param context The observing context.*/
 - (void)addObserver:(NSObject *)anObserver toObjectsAtIndices:(NSIndexSet *)indices forKeyPath:(NSString *)keyPath options:(NSKeyValueObservingOptions)options context:(void *)context;
 /**Registers an observer to receive key value observer notifications for the specified key-path relative to the objects at the first key value.
- @param anObserver The KVO Observer.
+ @param observer The KVO Observer.
  @param keyPath The key path to receive notifications for.
  @param options The observing options.
  @param context The observing context.*/
@@ -507,7 +507,7 @@
  @param keyPath The key path to remove notifications for.*/
 - (void)removeObserver:(NSObject *)anObserver fromObjectsAtIndices:(NSIndexSet *)indices forKeyPath:(NSString *)keyPath;
 /**Removes an observer to receive key value observer notifications for the specified key-path relative to the objects at the first key value.
- @param anObserver The KVO Observer.
+ @param observer The KVO Observer.
  @param keyPath The key path to remove notifications for.
  @param context The observing context.*/
 - (void)removeObserver:(NSObject *)observer forKeyPath:(NSString *)keyPath context:(void *)context;
@@ -542,14 +542,14 @@
  @return A copy of the ordered dictionary.*/
 - (id)copy;
 /**Returns a copy of the ordered dictionary.
- @param The zone to copy with.
+ @param zone  to copy with.
  @return A copy of the ordered dictionary.*/
 - (id)copyWithZone:(NSZone *)zone;
 /**Returns a mutable copy of the ordered dictionary.
  @return A copy of the ordered dictionary.*/
 - (id)mutableCopy;
 /**Returns a mutable copy of the ordered dictionary.
- @param The zone to copy with.
+ @param zone  to copy with.
  @return A copy of the ordered dictionary.*/
 - (id)mutableCopyWithZone:(NSZone *)zone;
 
@@ -574,11 +574,11 @@
 
 /**@name Creation and Initalization*/
 /**Create the mutable ordered dictionary with the given capacity.
- @param The capacity of the ordered dictionary.
+ @param numEntries The capacity of the ordered dictionary.
  @return A NSMutableOrderedDictionary object.*/
 + (instancetype)orderedDictionaryWithCapacity:(NSUInteger)numEntries;
 /**Initalize the mutable ordered dictionary with the given capacity.
- @param The capacity of the ordered dictionary.
+ @param numEntries The capacity of the ordered dictionary.
  @return A NSMutableOrderedDictionary object.*/
 - (id)initWithCapacity:(NSUInteger)numEntries;
 
@@ -631,11 +631,11 @@
 
 /**If a key exists will overrite the object for said key, not changing the order of keys. if the key does not exist, the entry will be inserted at the specified index.
  @param object The object to add.
- @param key The key to change the object for.
+ @param aKey The key to change the object for.
  @param index The index to insert the object if the key does not exist.*/
 - (void)setObject:(id)object forKey:(id<NSCopying>)aKey atIndex:(NSUInteger)index;
 /**If a key exists will overrite the object for said key, not changing the order of keys. if the key does not exist, the entry will be inserted at the specified index.
- @param object The entry to add.
+ @param entry The entry to add.
  @param index The index to insert the entry if the key does not exist.*/
 - (void)setEntry:(NSDictionary *)entry  atIndex:(NSUInteger)index;
 /**If a key exists will overrite the object for said key, not changing the order of keys. if the key does not exist, the entry will be inserted at the specified index.
@@ -655,7 +655,7 @@
  @param key The key for the entry to remove.*/
 - (void)removeObjectForKey:(id)key;
 /** Removes the entries for the given keys.
- @param key The keys for the entries to remove.*/
+ @param keys The keys for the entries to remove.*/
 - (void)removeObjectsForKeys:(NSArray *)keys;
 /** Removes all the entries in the ordered dictionary.*/
 - (void)removeAllObjects;
@@ -691,7 +691,7 @@
 /**Removes the given entry
  @param object The object to search for.
  @param key The key to search for.
- @param range The range to search over.*/
+ @param ramge The range to search over.*/
 - (void)removeEntryWithObject:(id)object pairedWithKey:(id<NSCopying>)key inRange:(NSRange)ramge;
 /**Removes the given entry
  @param entry The entry to search for.
@@ -762,7 +762,7 @@
 - (void)replaceEntriesInRange:(NSRange)range withEntriesFrom:(NSArray *)orderedEntries inRange:(NSRange)range2;
 /**Replace the entries in the given range with the given entries in the given range.
  @param range The range of objects to be replaced.
- @param orderedDictionary The entries to insert.
+ @param dictionary The entries to insert.
  @param range2 The range of the objects to insert.*/
 - (void)replaceEntriesInRange:(NSRange)range withEntriesFromOrderedDictionary:(M13OrderedDictionary *)dictionary inRange:(NSRange)range2;
 /**Replace the entries in the given range with the given entries.
@@ -773,12 +773,11 @@
 - (void)replaceEntriesInRange:(NSRange)range withObjectsFromArray:(NSArray *)objects pairedWithKeysFromArray:(NSArray *)keys;
 /**Replace the entries in the given range with the given entries.
  @param range The range of objects to be replaced.
- @param orderedEntries An ordered array with NSDictionarys with a single object-key pair as entries.
- @param range2 The range of the objects to insert.*/
+ @param orderedEntries An ordered array with NSDictionarys with a single object-key pair as entries.*/
 - (void)replaceEntriesInRange:(NSRange)range withEntriesFrom:(NSArray *)orderedEntries;
 /**Replace the entries in the given range with the given entries in the given range.
  @param range The range of objects to be replaced.
- @param orderedDictionary The entries to insert.*/
+ @param dictionary The entries to insert.*/
 - (void)replaceEntriesInRange:(NSRange)range withEntriesFromOrderedDictionary:(M13OrderedDictionary *)dictionary;
 /**Replace the current entries with the given entries. If there are less entries given than in the ordered dictionary, the entries past the count of the given entries will not be replaced.
  @param objects The objects of the new entries.

@@ -17,6 +17,7 @@ FOUNDATION_EXPORT const unsigned char UITransmissionRPCVersionString[];
 #import <UITransmissionRPC/RPCConfigValues.h>
 #import <UITransmissionRPC/TRInfos.h>
 #import <UITransmissionRPC/TRInfo.h>
+#import <NSTransmissionRPC/TRSessionInfo.h>
 #import <UITransmissionRPC/TRPeerInfo.h>
 #import <UITransmissionRPC/TRFileInfo.h>
 #import <UITransmissionRPC/TrackerStat.h>

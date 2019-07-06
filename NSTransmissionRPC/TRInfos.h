@@ -20,6 +20,7 @@
 + (TRInfos*)init;
 
 -(void) setInfosFromArrayOfJSON:(NSArray*)jsonArray;
+-(void) updateInfosWithArrayofJSON:(NSArray*)jsonArray;
 
 @property(nonatomic) NSMutableArray<TRInfo*> *items;
 

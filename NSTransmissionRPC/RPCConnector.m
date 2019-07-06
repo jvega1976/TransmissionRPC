@@ -91,6 +91,66 @@
     }];
 }
 
+- (void)getRecentlyActiveTorrents{
+    NSDictionary *requestVals = @{
+                                  TR_METHOD : TR_METHODNAME_TORRENTGET,
+                                  TR_METHOD_ARGS : @{
+                                          TR_ARG_FIELDS : @[
+                                                  TR_ARG_FIELDS_ID,
+                                                  TR_ARG_FIELDS_NAME,
+                                                  TR_ARG_FIELDS_STATUS,
+                                                  TR_ARG_FIELDS_ERRORNUM,
+                                                  TR_ARG_FIELDS_ERRORSTRING,
+                                                  TR_ARG_FIELDS_TOTALSIZE,
+                                                  TR_ARG_FIELDS_PERCENTDONE,
+                                                  TR_ARG_FIELDS_RATEDOWNLOAD,
+                                                  TR_ARG_FIELDS_RATEUPLOAD,
+                                                  TR_ARG_FIELDS_PEERSCONNECTED,
+                                                  TR_ARG_FIELDS_PEERSGETTINGFROMUS,
+                                                  TR_ARG_FIELDS_PEERSSENDINGTOUS,
+                                                  TR_ARG_FIELDS_UPLOADEDEVER,
+                                                  TR_ARG_FIELDS_UPLOADRATIO,
+                                                  TR_ARG_FIELDS_QUEUEPOSITION,
+                                                  TR_ARG_FIELDS_RECHECKPROGRESS,
+                                                  TR_ARG_FIELDS_DOWNLOADEDEVER,
+                                                  TR_ARG_FIELDS_ETA,
+                                                  TR_ARG_FIELDS_SEEDRATIOMODE,
+                                                  TR_ARG_FIELDS_SEEDRATIOLIMIT,
+                                                  TR_ARG_FIELDS_SEEDIDLEMODE,
+                                                  TR_ARG_FIELDS_SEEDIDLELIMIT,
+                                                  TR_ARG_FIELDS_UPLOADLIMITED,
+                                                  TR_ARG_FIELDS_UPLOADLIMIT,
+                                                  TR_ARG_FIELDS_DOWNLOADLIMITED,
+                                                  TR_ARG_FIELDS_DOWNLOADLIMIT,
+                                                  TR_ARG_FIELDS_HAVEVALID,
+                                                  TR_ARG_FIELDS_DOWNLOADDIR,
+                                                  TR_ARG_FIELDS_ISFINISHED,
+                                                  TR_ARG_FIELDS_PIECECOUNT,
+                                                  TR_ARG_FIELDS_PIECESIZE,
+                                                  TR_ARG_FIELDS_PEERLIMIT,
+                                                  TR_ARG_FIELDS_BANDWIDTHPRIORITY,
+                                                  TR_ARG_FIELDS_DONEDATE,
+                                                  TR_ARG_FIELDS_ADDDATE,
+                                                  TR_ARG_FIELDS_DATECREATED
+                                                  ],
+                                          TR_ARG_IDS : TR_RECENTLY_ACTIVE
+                                          }
+                                  };
+    
+    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+     {
+         // save torrents and call delegate
+         NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
+         
+         [TRInfos.sharedTRInfos updateInfosWithArrayofJSON:torrentsJsonDesc];
+         
+         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllTorrents:)])
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [self.delegate gotAllTorrents:TRInfos.sharedTRInfos];
+             });
+     }];
+}
+
 - (TRInfos*)returnAllTorrents
 {
     NSDictionary *requestVals = @{
@@ -388,6 +448,26 @@
          if( delegate && [delegate respondsToSelector:@selector(gotPiecesBitmap:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
                  [delegate gotPiecesBitmap:data forTorrentWithId:torrentId];
+             });
+     }];
+}
+
+
+- (void)addTrackers:(NSArray*)trackerURL forTorrent:(int)torrentId
+{
+    NSDictionary *requestVals = @{
+                                  TR_METHOD : TR_METHODNAME_TORRENTSET,
+                                  TR_METHOD_ARGS : @{
+                                          TR_ARG_FIELDS_TRACKERADD : trackerURL,
+                                          TR_ARG_IDS : @[@(torrentId)]
+                                          }
+                                  };
+    
+    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+     {
+         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTrackersAdded:forTorrentWithId:)])
+             dispatch_async(dispatch_get_main_queue(), ^{
+                 [self.delegate gotTrackersAdded:trackerURL forTorrentWithId:torrentId];
              });
      }];
 }

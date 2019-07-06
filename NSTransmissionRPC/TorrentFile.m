@@ -60,7 +60,7 @@ static NSString * const kEmptyString        = @"";
     {
         list = [NSMutableArray array];
         NSURL *url = [NSURL URLWithString:_benDict[kAnnounceKey]];
-        [list addObject:url.host];
+        [list addObject:url.absoluteString];
     }
     
     _trList = list.count > 0 ? list : nil;

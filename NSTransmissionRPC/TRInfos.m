@@ -64,12 +64,27 @@
     NSMutableArray *items = [NSMutableArray array];
     for( NSDictionary* d in jsonArray)
         [items addObject: [TRInfo infoFromJSON:d]];
-    NSArray *sortdescs = [NSArray arrayWithObjects:[NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES],nil];
+    NSArray *sortdescs = [NSArray arrayWithObjects:[[NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES] reversedSortDescriptor],nil];
     [items sortUsingDescriptors:sortdescs];
     _items = items;
 }
 
-
+-(void) updateInfosWithArrayofJSON:(NSArray*)jsonArray {
+    NSArray *sortdescs = [NSArray arrayWithObjects:[[NSSortDescriptor sortDescriptorWithKey:@"trId" ascending:YES] reversedSortDescriptor],nil];
+    [_items sortUsingDescriptors:sortdescs];
+    for( NSDictionary* d in jsonArray) {
+        TRInfo *trInfo = [TRInfo infoFromJSON:d];
+        NSInteger index = [_items indexOfObjectPassingTest:^BOOL(TRInfo * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (obj.trId == trInfo.trId)
+                return TRUE;
+            return FALSE;
+        }];
+        if (index == NSNotFound)
+            [_items insertObject:trInfo atIndex:0];
+        else
+            [_items replaceObjectAtIndex:index withObject:trInfo];
+    }
+}
 
 #define CHACHE_KEY_TOTALUPSTR   @"totalUpRateStr"
 - (NSString *)totalUploadRateString

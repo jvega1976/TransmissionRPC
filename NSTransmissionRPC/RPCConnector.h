@@ -38,6 +38,7 @@
 @optional - (void)gotFreeSpaceString:(NSString*)freeSpace;
 @optional - (void)gotPortTestedWithSuccess:(BOOL)portIsOpen;
 @optional - (void)gotAllTrackers:(NSArray*)trackerStats forTorrentWithId:(int)torrentId;
+@optional - (void)gotTrackersAdded:(NSArray*)trackerURL forTorrentWithId:(int)torrentId;
 @optional - (void)gotTrackerRemoved:(int)trackerId forTorrentWithId:(int)torrentId;
 @optional - (void)gotSetSettingsForTorrentWithId:(int)torrentId;
 @optional - (void)gotAllTorrentsStopped;
@@ -92,6 +93,11 @@
  Method to request information for all Torrents.  You must implement the gotAllTorrents method of the RPCConnectorDelegate protocol to obtain the returned Torrents info.
  */
 - (void)getAllTorrents;
+
+/*!
+ Method to request information for only recently active Torrents.  You must implement the gotAllTorrents method of the RPCConnectorDelegate protocol to obtain the returned Torrents info.
+ */
+- (void)getRecentlyActiveTorrents;
 
 
 /*!
@@ -149,6 +155,7 @@
 - (void)getAllFileStatsForTorrentWithId:(int)torrentId;
 
 - (void)getAllTrackersForTorrentWithId:(int)torrentId;
+- (void)addTrackers:(NSArray*)trackerURL forTorrent:(int)torrentId;
 - (void)removeTracker:(int)trackerId forTorrent:(int)torrentId;
 
 - (void)stopDownloadingFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId;
