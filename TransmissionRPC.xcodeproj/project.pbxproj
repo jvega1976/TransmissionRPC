@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B85A6E84225817AA0017C009 /* NSBencodeSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0CA225472D900AE0DFD /* NSBencodeSerialization.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		B85A6E84225817AA0017C009 /* NSBencodeSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0CA225472D900AE0DFD /* NSBencodeSerialization.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B85A6E85225817AA0017C009 /* FSDirectory.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD09B2254703300AE0DFD /* FSDirectory.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B85A6E86225817AA0017C009 /* GlobalConsts.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD09D2254703300AE0DFD /* GlobalConsts.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B85A6E87225817AA0017C009 /* MagnetURL.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0922254703300AE0DFD /* MagnetURL.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -52,9 +52,9 @@
 		B89AD0CD225472D900AE0DFD /* M13OrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0C9225472D900AE0DFD /* M13OrderedDictionary.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		B89AD0CE225472D900AE0DFD /* NSBencodeSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0CA225472D900AE0DFD /* NSBencodeSerialization.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		B89AD0CF225472D900AE0DFD /* M13OrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD0CB225472D900AE0DFD /* M13OrderedDictionary.m */; };
-		B89AD53422547EEC00AE0DFD /* TransmissionRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD53222547EEC00AE0DFD /* TransmissionRPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B89AD53422547EEC00AE0DFD /* UITransmissionRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD53222547EEC00AE0DFD /* UITransmissionRPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B89AD53822547EFA00AE0DFD /* NSBencodeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD0C8225472D900AE0DFD /* NSBencodeSerialization.m */; };
-		B89AD53922547EFE00AE0DFD /* M13OrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0C9225472D900AE0DFD /* M13OrderedDictionary.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		B89AD53922547EFE00AE0DFD /* M13OrderedDictionary.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0C9225472D900AE0DFD /* M13OrderedDictionary.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B89AD53A22547F0000AE0DFD /* M13OrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD0CB225472D900AE0DFD /* M13OrderedDictionary.m */; };
 		B89AD53B22547F1200AE0DFD /* FSDirectory.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD09E2254703300AE0DFD /* FSDirectory.m */; };
 		B89AD53C22547F1200AE0DFD /* GlobalConsts.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD0A12254703400AE0DFD /* GlobalConsts.m */; };
@@ -68,9 +68,10 @@
 		B89AD54422547F1200AE0DFD /* TRPeerInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD0A42254703400AE0DFD /* TRPeerInfo.m */; };
 		B89AD54522547F1200AE0DFD /* TRSessionInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = B89AD0952254703300AE0DFD /* TRSessionInfo.m */; };
 		B89AD5832254A39700AE0DFD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B89AD0C3225472AC00AE0DFD /* Foundation.framework */; };
+		B89FC25B22D2611400CBD675 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B89FC25A22D2611400CBD675 /* UIKit.framework */; };
 		B8B11BF02262F34A00A58B92 /* transmission.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD09F2254703300AE0DFD /* transmission.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B8B11BF32262F82100A58B92 /* TRFileInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD09C2254703300AE0DFD /* TRFileInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B8B11D172263068100A58B92 /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0942254703300AE0DFD /* tr-macros.h */; };
+		B8B11D172263068100A58B92 /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = B89AD0942254703300AE0DFD /* tr-macros.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -122,9 +123,10 @@
 		B89AD0CA225472D900AE0DFD /* NSBencodeSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSBencodeSerialization.h; sourceTree = "<group>"; };
 		B89AD0CB225472D900AE0DFD /* M13OrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = M13OrderedDictionary.m; sourceTree = "<group>"; };
 		B89AD53022547EEC00AE0DFD /* UITransmissionRPC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = UITransmissionRPC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B89AD53222547EEC00AE0DFD /* TransmissionRPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransmissionRPC.h; sourceTree = "<group>"; };
+		B89AD53222547EEC00AE0DFD /* UITransmissionRPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UITransmissionRPC.h; sourceTree = "<group>"; };
 		B89AD53322547EEC00AE0DFD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B89AD5492254865D00AE0DFD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS12.2.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		B89FC25A22D2611400CBD675 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS13.0.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -148,6 +150,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B89FC25B22D2611400CBD675 /* UIKit.framework in Frameworks */,
 				B85A6E952258183C0017C009 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -223,6 +226,7 @@
 		B89AD0C2225472AB00AE0DFD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				B89FC25A22D2611400CBD675 /* UIKit.framework */,
 				B89AD5492254865D00AE0DFD /* Foundation.framework */,
 				B89AD0C5225472B300AE0DFD /* AppKit.framework */,
 				B89AD0C3225472AC00AE0DFD /* Foundation.framework */,
@@ -244,7 +248,7 @@
 		B89AD53122547EEC00AE0DFD /* UITransmissionRPC */ = {
 			isa = PBXGroup;
 			children = (
-				B89AD53222547EEC00AE0DFD /* TransmissionRPC.h */,
+				B89AD53222547EEC00AE0DFD /* UITransmissionRPC.h */,
 				B89AD53322547EEC00AE0DFD /* Info.plist */,
 			);
 			path = UITransmissionRPC;
@@ -290,14 +294,14 @@
 				B85A6E8D225817AA0017C009 /* TrackerStat.h in Headers */,
 				B85A6E90225817AA0017C009 /* TRInfo.h in Headers */,
 				B85A6E91225817AA0017C009 /* TRInfos.h in Headers */,
-				B8B11D172263068100A58B92 /* tr-macros.h in Headers */,
 				B85A6E92225817AA0017C009 /* TRPeerInfo.h in Headers */,
 				B85A6E93225817AA0017C009 /* TRSessionInfo.h in Headers */,
 				B8B11BF32262F82100A58B92 /* TRFileInfo.h in Headers */,
 				B8B11BF02262F34A00A58B92 /* transmission.h in Headers */,
-				B85A6E84225817AA0017C009 /* NSBencodeSerialization.h in Headers */,
+				B89AD53422547EEC00AE0DFD /* UITransmissionRPC.h in Headers */,
+				B8B11D172263068100A58B92 /* tr-macros.h in Headers */,
 				B89AD53922547EFE00AE0DFD /* M13OrderedDictionary.h in Headers */,
-				B89AD53422547EEC00AE0DFD /* TransmissionRPC.h in Headers */,
+				B85A6E84225817AA0017C009 /* NSBencodeSerialization.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
