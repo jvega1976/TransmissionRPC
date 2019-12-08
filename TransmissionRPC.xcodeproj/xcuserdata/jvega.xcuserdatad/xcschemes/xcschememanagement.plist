@@ -4,34 +4,45 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>NSTransmissionRPC.xcscheme_^#shared#^_</key>
+		<key>TransmissionRPCTests.xcscheme_^#shared#^_</key>
 		<dict>
-			<key>isShown</key>
-			<true/>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
-		<key>TransmissionRPC - iOS.xcscheme_^#shared#^_</key>
+		<key>TransmissionRPC_iOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>5</integer>
+			<integer>10</integer>
 		</dict>
-		<key>UITransmissionKit.xcscheme_^#shared#^_</key>
+		<key>TransmissionRPC_macOS.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>19</integer>
+			<integer>6</integer>
 		</dict>
-		<key>UITransmissionRPC.xcscheme_^#shared#^_</key>
+		<key>TransmissionRPC_macOSCatalyst.xcscheme_^#shared#^_</key>
 		<dict>
-			<key>isShown</key>
-			<false/>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>12</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>B89AD52F22547EEC00AE0DFD</key>
+		<key>B87FDB34235306570052C393</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B87FDBD92355160F0052C393</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B8E3F3D522D74D6300C80EEE</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>B8E3F3DE22D74D6300C80EEE</key>
 		<dict>
 			<key>primary</key>
 			<true/>
