@@ -1,0 +1,953 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 52;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B8181AAA235BD25D001637FE /* RPCRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8181AA9235BD25D001637FE /* RPCRequests.swift */; };
+		B843946E22E50E3E00946F69 /* BencodeSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946622E50E3E00946F69 /* BencodeSequence.swift */; };
+		B843946F22E50E3E00946F69 /* BencodeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946722E50E3E00946F69 /* BencodeKey.swift */; };
+		B843947022E50E3E00946F69 /* BencodeAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946822E50E3E00946F69 /* BencodeAccessors.swift */; };
+		B843947122E50E3E00946F69 /* BencoderError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946922E50E3E00946F69 /* BencoderError.swift */; };
+		B843947222E50E3E00946F69 /* BencodeDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946A22E50E3E00946F69 /* BencodeDescription.swift */; };
+		B843947322E50E3E00946F69 /* Bencoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946B22E50E3E00946F69 /* Bencoder.swift */; };
+		B843947422E50E3E00946F69 /* Bencode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946C22E50E3E00946F69 /* Bencode.swift */; };
+		B843947522E50E3E00946F69 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946D22E50E3E00946F69 /* Extensions.swift */; };
+		B843947722E50E6C00946F69 /* FSItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843947622E50E6B00946F69 /* FSItem.swift */; };
+		B843947922E51CCF00946F69 /* SessionStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843947822E51CCF00946F69 /* SessionStats.swift */; };
+		B8487A6023514ED500929CD6 /* RPCSession-Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487A5F23514ED500929CD6 /* RPCSession-Ext.swift */; };
+		B87FDB2B2352FF160052C393 /* JSONStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87FDB2A2352FF160052C393 /* JSONStructures.swift */; };
+		B87FDB3D235306660052C393 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B87FDB2E235306000052C393 /* AppKit.framework */; };
+		B87FDB3E235306870052C393 /* JSONStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87FDB2A2352FF160052C393 /* JSONStructures.swift */; };
+		B87FDB40235306870052C393 /* FSDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FA22D74E4300C80EEE /* FSDirectory.swift */; };
+		B87FDB41235306870052C393 /* FSItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843947622E50E6B00946F69 /* FSItem.swift */; };
+		B87FDB42235306870052C393 /* GlobalFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FF22D74E4300C80EEE /* GlobalFunctions.swift */; };
+		B87FDB43235306870052C393 /* MagnetURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F522D74E4300C80EEE /* MagnetURL.swift */; };
+		B87FDB44235306870052C393 /* RPCConfigValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F422D74E4300C80EEE /* RPCConfigValues.swift */; };
+		B87FDB45235306870052C393 /* RPCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F722D74E4300C80EEE /* RPCSession.swift */; };
+		B87FDB46235306870052C393 /* RPCSession-Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487A5F23514ED500929CD6 /* RPCSession-Ext.swift */; };
+		B87FDB47235306870052C393 /* TorrentFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F322D74E4300C80EEE /* TorrentFile.swift */; };
+		B87FDB48235306870052C393 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F222D74E4300C80EEE /* Tracker.swift */; };
+		B87FDB49235306870052C393 /* FileStat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FC22D74E4300C80EEE /* FileStat.swift */; };
+		B87FDB4A235306870052C393 /* Torrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FD22D74E4300C80EEE /* Torrent.swift */; };
+		B87FDB4B235306870052C393 /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F622D74E4300C80EEE /* Peer.swift */; };
+		B87FDB4C235306870052C393 /* SessionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FB22D74E4300C80EEE /* SessionConfig.swift */; };
+		B87FDB4D235306870052C393 /* SessionStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843947822E51CCF00946F69 /* SessionStats.swift */; };
+		B87FDB4E235306A20052C393 /* Bencode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946C22E50E3E00946F69 /* Bencode.swift */; };
+		B87FDB4F235306A20052C393 /* BencodeAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946822E50E3E00946F69 /* BencodeAccessors.swift */; };
+		B87FDB50235306A20052C393 /* BencodeDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946A22E50E3E00946F69 /* BencodeDescription.swift */; };
+		B87FDB51235306A20052C393 /* BencodeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946722E50E3E00946F69 /* BencodeKey.swift */; };
+		B87FDB52235306A20052C393 /* Bencoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946B22E50E3E00946F69 /* Bencoder.swift */; };
+		B87FDB53235306A20052C393 /* BencoderError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946922E50E3E00946F69 /* BencoderError.swift */; };
+		B87FDB54235306A20052C393 /* BencodeSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946622E50E3E00946F69 /* BencodeSequence.swift */; };
+		B87FDB55235306A20052C393 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946D22E50E3E00946F69 /* Extensions.swift */; };
+		B87FDB5623530CC40052C393 /* TransmissionRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = B8E3F3D922D74D6300C80EEE /* TransmissionRPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B87FDB5723530CF00052C393 /* TransmissionRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = B8E3F3D922D74D6300C80EEE /* TransmissionRPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B87FDBCB235514040052C393 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8E3F41322D74EC700C80EEE /* UIKit.framework */; platformFilter = ios; };
+		B87FDBE22355164E0052C393 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8E3F41322D74EC700C80EEE /* UIKit.framework */; platformFilter = ios; };
+		B87FDBE3235516510052C393 /* FileStat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FC22D74E4300C80EEE /* FileStat.swift */; };
+		B87FDBE4235516510052C393 /* FSDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FA22D74E4300C80EEE /* FSDirectory.swift */; };
+		B87FDBE5235516510052C393 /* FSItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843947622E50E6B00946F69 /* FSItem.swift */; };
+		B87FDBE6235516510052C393 /* GlobalFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FF22D74E4300C80EEE /* GlobalFunctions.swift */; };
+		B87FDBE7235516510052C393 /* JSONStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87FDB2A2352FF160052C393 /* JSONStructures.swift */; };
+		B87FDBE8235516510052C393 /* MagnetURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F522D74E4300C80EEE /* MagnetURL.swift */; };
+		B87FDBE9235516510052C393 /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F622D74E4300C80EEE /* Peer.swift */; };
+		B87FDBEA235516510052C393 /* RPCConfigValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F422D74E4300C80EEE /* RPCConfigValues.swift */; };
+		B87FDBEB235516510052C393 /* RPCSession-Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8487A5F23514ED500929CD6 /* RPCSession-Ext.swift */; };
+		B87FDBEC235516510052C393 /* RPCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F722D74E4300C80EEE /* RPCSession.swift */; };
+		B87FDBED235516510052C393 /* SessionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FB22D74E4300C80EEE /* SessionConfig.swift */; };
+		B87FDBEE235516510052C393 /* SessionStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843947822E51CCF00946F69 /* SessionStats.swift */; };
+		B87FDBEF235516510052C393 /* Torrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FD22D74E4300C80EEE /* Torrent.swift */; };
+		B87FDBF0235516510052C393 /* TorrentFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F322D74E4300C80EEE /* TorrentFile.swift */; };
+		B87FDBF1235516510052C393 /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F222D74E4300C80EEE /* Tracker.swift */; };
+		B87FDBF32355166C0052C393 /* Bencode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946C22E50E3E00946F69 /* Bencode.swift */; };
+		B87FDBF42355166C0052C393 /* BencodeAccessors.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946822E50E3E00946F69 /* BencodeAccessors.swift */; };
+		B87FDBF52355166C0052C393 /* BencodeDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946A22E50E3E00946F69 /* BencodeDescription.swift */; };
+		B87FDBF62355166C0052C393 /* BencodeKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946722E50E3E00946F69 /* BencodeKey.swift */; };
+		B87FDBF72355166C0052C393 /* Bencoder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946B22E50E3E00946F69 /* Bencoder.swift */; };
+		B87FDBF82355166C0052C393 /* BencoderError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946922E50E3E00946F69 /* BencoderError.swift */; };
+		B87FDBF92355166C0052C393 /* BencodeSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946622E50E3E00946F69 /* BencodeSequence.swift */; };
+		B87FDBFA2355166C0052C393 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B843946D22E50E3E00946F69 /* Extensions.swift */; };
+		B88A2A2F239C91E9003EA22C /* TransmissionRPC.h in Headers */ = {isa = PBXBuildFile; fileRef = B8E3F3D922D74D6300C80EEE /* TransmissionRPC.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		B88A2A31239C9484003EA22C /* Info_macOS.plist in Resources */ = {isa = PBXBuildFile; fileRef = B88A2A30239C9484003EA22C /* Info_macOS.plist */; };
+		B8E3F3E022D74D6300C80EEE /* TransmissionRPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B8E3F3D622D74D6300C80EEE /* TransmissionRPC.framework */; };
+		B8E3F3E522D74D6300C80EEE /* TransmissionRPCTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3E422D74D6300C80EEE /* TransmissionRPCTests.swift */; };
+		B8E3F40022D74E4300C80EEE /* Tracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F222D74E4300C80EEE /* Tracker.swift */; };
+		B8E3F40122D74E4300C80EEE /* TorrentFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F322D74E4300C80EEE /* TorrentFile.swift */; };
+		B8E3F40222D74E4300C80EEE /* RPCConfigValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F422D74E4300C80EEE /* RPCConfigValues.swift */; };
+		B8E3F40322D74E4300C80EEE /* MagnetURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F522D74E4300C80EEE /* MagnetURL.swift */; };
+		B8E3F40422D74E4300C80EEE /* Peer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F622D74E4300C80EEE /* Peer.swift */; };
+		B8E3F40522D74E4300C80EEE /* RPCSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3F722D74E4300C80EEE /* RPCSession.swift */; };
+		B8E3F40822D74E4300C80EEE /* FSDirectory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FA22D74E4300C80EEE /* FSDirectory.swift */; };
+		B8E3F40922D74E4300C80EEE /* SessionConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FB22D74E4300C80EEE /* SessionConfig.swift */; };
+		B8E3F40A22D74E4300C80EEE /* FileStat.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FC22D74E4300C80EEE /* FileStat.swift */; };
+		B8E3F40B22D74E4300C80EEE /* Torrent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FD22D74E4300C80EEE /* Torrent.swift */; };
+		B8E3F40D22D74E4300C80EEE /* GlobalFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8E3F3FF22D74E4300C80EEE /* GlobalFunctions.swift */; };
+		B8E956942362758800EEF13A /* RPCRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8181AA9235BD25D001637FE /* RPCRequests.swift */; };
+		B8E956952362758800EEF13A /* RPCRequests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8181AA9235BD25D001637FE /* RPCRequests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B8E3F3E122D74D6300C80EEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B8E3F3CD22D74D6300C80EEE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B8E3F3D522D74D6300C80EEE;
+			remoteInfo = TransmissionRPC;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		B8181AA9235BD25D001637FE /* RPCRequests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RPCRequests.swift; sourceTree = "<group>"; };
+		B843946622E50E3E00946F69 /* BencodeSequence.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BencodeSequence.swift; path = Bencode/BencodeSequence.swift; sourceTree = SOURCE_ROOT; };
+		B843946722E50E3E00946F69 /* BencodeKey.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BencodeKey.swift; path = Bencode/BencodeKey.swift; sourceTree = SOURCE_ROOT; };
+		B843946822E50E3E00946F69 /* BencodeAccessors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BencodeAccessors.swift; path = Bencode/BencodeAccessors.swift; sourceTree = SOURCE_ROOT; };
+		B843946922E50E3E00946F69 /* BencoderError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BencoderError.swift; path = Bencode/BencoderError.swift; sourceTree = SOURCE_ROOT; };
+		B843946A22E50E3E00946F69 /* BencodeDescription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BencodeDescription.swift; path = Bencode/BencodeDescription.swift; sourceTree = SOURCE_ROOT; };
+		B843946B22E50E3E00946F69 /* Bencoder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bencoder.swift; path = Bencode/Bencoder.swift; sourceTree = SOURCE_ROOT; };
+		B843946C22E50E3E00946F69 /* Bencode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Bencode.swift; path = Bencode/Bencode.swift; sourceTree = SOURCE_ROOT; };
+		B843946D22E50E3E00946F69 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Extensions.swift; path = Bencode/Extensions.swift; sourceTree = SOURCE_ROOT; };
+		B843947622E50E6B00946F69 /* FSItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSItem.swift; sourceTree = "<group>"; };
+		B843947822E51CCF00946F69 /* SessionStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStats.swift; sourceTree = "<group>"; };
+		B8487A5F23514ED500929CD6 /* RPCSession-Ext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RPCSession-Ext.swift"; sourceTree = "<group>"; };
+		B87FDB2A2352FF160052C393 /* JSONStructures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONStructures.swift; sourceTree = "<group>"; };
+		B87FDB2E235306000052C393 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/AppKit.framework; sourceTree = DEVELOPER_DIR; };
+		B87FDB35235306570052C393 /* TransmissionRPC_macOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TransmissionRPC_macOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B87FDBDA2355160F0052C393 /* TransmissionRPC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TransmissionRPC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B88A2A30239C9484003EA22C /* Info_macOS.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info_macOS.plist; sourceTree = "<group>"; };
+		B8E3F3D622D74D6300C80EEE /* TransmissionRPC.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = TransmissionRPC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8E3F3D922D74D6300C80EEE /* TransmissionRPC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TransmissionRPC.h; sourceTree = "<group>"; };
+		B8E3F3DA22D74D6300C80EEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B8E3F3DF22D74D6300C80EEE /* TransmissionRPCTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TransmissionRPCTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B8E3F3E422D74D6300C80EEE /* TransmissionRPCTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmissionRPCTests.swift; sourceTree = "<group>"; };
+		B8E3F3E622D74D6300C80EEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B8E3F3F222D74E4300C80EEE /* Tracker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tracker.swift; sourceTree = "<group>"; };
+		B8E3F3F322D74E4300C80EEE /* TorrentFile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TorrentFile.swift; sourceTree = "<group>"; };
+		B8E3F3F422D74E4300C80EEE /* RPCConfigValues.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RPCConfigValues.swift; sourceTree = "<group>"; };
+		B8E3F3F522D74E4300C80EEE /* MagnetURL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MagnetURL.swift; sourceTree = "<group>"; };
+		B8E3F3F622D74E4300C80EEE /* Peer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Peer.swift; sourceTree = "<group>"; };
+		B8E3F3F722D74E4300C80EEE /* RPCSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RPCSession.swift; sourceTree = "<group>"; };
+		B8E3F3FA22D74E4300C80EEE /* FSDirectory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FSDirectory.swift; sourceTree = "<group>"; };
+		B8E3F3FB22D74E4300C80EEE /* SessionConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionConfig.swift; sourceTree = "<group>"; };
+		B8E3F3FC22D74E4300C80EEE /* FileStat.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileStat.swift; sourceTree = "<group>"; };
+		B8E3F3FD22D74E4300C80EEE /* Torrent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Torrent.swift; sourceTree = "<group>"; };
+		B8E3F3FF22D74E4300C80EEE /* GlobalFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalFunctions.swift; sourceTree = "<group>"; };
+		B8E3F41322D74EC700C80EEE /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B87FDB32235306570052C393 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDB3D235306660052C393 /* AppKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B87FDBD72355160F0052C393 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDBE22355164E0052C393 /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3D322D74D6300C80EEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDBCB235514040052C393 /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3DC22D74D6300C80EEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8E3F3E022D74D6300C80EEE /* TransmissionRPC.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B843944322E50C8000946F69 /* Bencode */ = {
+			isa = PBXGroup;
+			children = (
+				B843946822E50E3E00946F69 /* BencodeAccessors.swift */,
+				B843946C22E50E3E00946F69 /* Bencode.swift */,
+				B843946A22E50E3E00946F69 /* BencodeDescription.swift */,
+				B843946722E50E3E00946F69 /* BencodeKey.swift */,
+				B843946B22E50E3E00946F69 /* Bencoder.swift */,
+				B843946922E50E3E00946F69 /* BencoderError.swift */,
+				B843946622E50E3E00946F69 /* BencodeSequence.swift */,
+				B843946D22E50E3E00946F69 /* Extensions.swift */,
+			);
+			name = Bencode;
+			path = ../../../../System/Volumes/Data/Users/jvega/Dropbox/TransmissionRPC_Swift/Bencode;
+			sourceTree = "<group>";
+		};
+		B8E3F3CC22D74D6300C80EEE = {
+			isa = PBXGroup;
+			children = (
+				B843944322E50C8000946F69 /* Bencode */,
+				B8E3F3D822D74D6300C80EEE /* TransmissionRPC */,
+				B8E3F3E322D74D6300C80EEE /* TransmissionRPCTests */,
+				B8E3F3D722D74D6300C80EEE /* Products */,
+				B8E3F41222D74EC700C80EEE /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		B8E3F3D722D74D6300C80EEE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B8E3F3D622D74D6300C80EEE /* TransmissionRPC.framework */,
+				B8E3F3DF22D74D6300C80EEE /* TransmissionRPCTests.xctest */,
+				B87FDB35235306570052C393 /* TransmissionRPC_macOS.framework */,
+				B87FDBDA2355160F0052C393 /* TransmissionRPC.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B8E3F3D822D74D6300C80EEE /* TransmissionRPC */ = {
+			isa = PBXGroup;
+			children = (
+				B88A2A30239C9484003EA22C /* Info_macOS.plist */,
+				B8E3F3FC22D74E4300C80EEE /* FileStat.swift */,
+				B8E3F3FA22D74E4300C80EEE /* FSDirectory.swift */,
+				B843947622E50E6B00946F69 /* FSItem.swift */,
+				B8E3F3FF22D74E4300C80EEE /* GlobalFunctions.swift */,
+				B8E3F3DA22D74D6300C80EEE /* Info.plist */,
+				B87FDB2A2352FF160052C393 /* JSONStructures.swift */,
+				B8E3F3F522D74E4300C80EEE /* MagnetURL.swift */,
+				B8E3F3F622D74E4300C80EEE /* Peer.swift */,
+				B8E3F3F422D74E4300C80EEE /* RPCConfigValues.swift */,
+				B8181AA9235BD25D001637FE /* RPCRequests.swift */,
+				B8487A5F23514ED500929CD6 /* RPCSession-Ext.swift */,
+				B8E3F3F722D74E4300C80EEE /* RPCSession.swift */,
+				B8E3F3FB22D74E4300C80EEE /* SessionConfig.swift */,
+				B843947822E51CCF00946F69 /* SessionStats.swift */,
+				B8E3F3FD22D74E4300C80EEE /* Torrent.swift */,
+				B8E3F3F322D74E4300C80EEE /* TorrentFile.swift */,
+				B8E3F3F222D74E4300C80EEE /* Tracker.swift */,
+				B8E3F3D922D74D6300C80EEE /* TransmissionRPC.h */,
+			);
+			path = TransmissionRPC;
+			sourceTree = "<group>";
+		};
+		B8E3F3E322D74D6300C80EEE /* TransmissionRPCTests */ = {
+			isa = PBXGroup;
+			children = (
+				B8E3F3E422D74D6300C80EEE /* TransmissionRPCTests.swift */,
+				B8E3F3E622D74D6300C80EEE /* Info.plist */,
+			);
+			path = TransmissionRPCTests;
+			sourceTree = "<group>";
+		};
+		B8E3F41222D74EC700C80EEE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B87FDB2E235306000052C393 /* AppKit.framework */,
+				B8E3F41322D74EC700C80EEE /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		B87FDB30235306570052C393 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDB5723530CF00052C393 /* TransmissionRPC.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B87FDBD52355160F0052C393 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B88A2A2F239C91E9003EA22C /* TransmissionRPC.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3D122D74D6300C80EEE /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDB5623530CC40052C393 /* TransmissionRPC.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		B87FDB34235306570052C393 /* TransmissionRPC_macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B87FDB3A235306570052C393 /* Build configuration list for PBXNativeTarget "TransmissionRPC_macOS" */;
+			buildPhases = (
+				B87FDB30235306570052C393 /* Headers */,
+				B87FDB31235306570052C393 /* Sources */,
+				B87FDB32235306570052C393 /* Frameworks */,
+				B87FDB33235306570052C393 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TransmissionRPC_macOS;
+			productName = TransmissionRPC_macOS;
+			productReference = B87FDB35235306570052C393 /* TransmissionRPC_macOS.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B87FDBD92355160F0052C393 /* TransmissionRPC_macOSCatalyst */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B87FDBDF2355160F0052C393 /* Build configuration list for PBXNativeTarget "TransmissionRPC_macOSCatalyst" */;
+			buildPhases = (
+				B87FDBD52355160F0052C393 /* Headers */,
+				B87FDBD62355160F0052C393 /* Sources */,
+				B87FDBD72355160F0052C393 /* Frameworks */,
+				B87FDBD82355160F0052C393 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TransmissionRPC_macOSCatalyst;
+			productName = UITransmission_macOS;
+			productReference = B87FDBDA2355160F0052C393 /* TransmissionRPC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B8E3F3D522D74D6300C80EEE /* TransmissionRPC_iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8E3F3EA22D74D6300C80EEE /* Build configuration list for PBXNativeTarget "TransmissionRPC_iOS" */;
+			buildPhases = (
+				B8E3F3D122D74D6300C80EEE /* Headers */,
+				B8E3F3D222D74D6300C80EEE /* Sources */,
+				B8E3F3D322D74D6300C80EEE /* Frameworks */,
+				B8E3F3D422D74D6300C80EEE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TransmissionRPC_iOS;
+			productName = TransmissionRPC;
+			productReference = B8E3F3D622D74D6300C80EEE /* TransmissionRPC.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		B8E3F3DE22D74D6300C80EEE /* TransmissionRPCTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B8E3F3ED22D74D6300C80EEE /* Build configuration list for PBXNativeTarget "TransmissionRPCTests" */;
+			buildPhases = (
+				B8E3F3DB22D74D6300C80EEE /* Sources */,
+				B8E3F3DC22D74D6300C80EEE /* Frameworks */,
+				B8E3F3DD22D74D6300C80EEE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B8E3F3E222D74D6300C80EEE /* PBXTargetDependency */,
+			);
+			name = TransmissionRPCTests;
+			productName = TransmissionRPCTests;
+			productReference = B8E3F3DF22D74D6300C80EEE /* TransmissionRPCTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B8E3F3CD22D74D6300C80EEE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1120;
+				LastUpgradeCheck = 1100;
+				TargetAttributes = {
+					B87FDB34235306570052C393 = {
+						CreatedOnToolsVersion = 11.2;
+					};
+					B87FDBD92355160F0052C393 = {
+						CreatedOnToolsVersion = 11.2;
+					};
+					B8E3F3D522D74D6300C80EEE = {
+						CreatedOnToolsVersion = 11.0;
+						LastSwiftMigration = 1100;
+					};
+					B8E3F3DE22D74D6300C80EEE = {
+						CreatedOnToolsVersion = 11.0;
+					};
+				};
+			};
+			buildConfigurationList = B8E3F3D022D74D6300C80EEE /* Build configuration list for PBXProject "TransmissionRPC" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B8E3F3CC22D74D6300C80EEE;
+			productRefGroup = B8E3F3D722D74D6300C80EEE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B8E3F3D522D74D6300C80EEE /* TransmissionRPC_iOS */,
+				B8E3F3DE22D74D6300C80EEE /* TransmissionRPCTests */,
+				B87FDB34235306570052C393 /* TransmissionRPC_macOS */,
+				B87FDBD92355160F0052C393 /* TransmissionRPC_macOSCatalyst */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B87FDB33235306570052C393 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B87FDBD82355160F0052C393 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3D422D74D6300C80EEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B88A2A31239C9484003EA22C /* Info_macOS.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3DD22D74D6300C80EEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B87FDB31235306570052C393 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDB55235306A20052C393 /* Extensions.swift in Sources */,
+				B87FDB4B235306870052C393 /* Peer.swift in Sources */,
+				B87FDB50235306A20052C393 /* BencodeDescription.swift in Sources */,
+				B87FDB47235306870052C393 /* TorrentFile.swift in Sources */,
+				B87FDB45235306870052C393 /* RPCSession.swift in Sources */,
+				B87FDB4A235306870052C393 /* Torrent.swift in Sources */,
+				B87FDB48235306870052C393 /* Tracker.swift in Sources */,
+				B87FDB4D235306870052C393 /* SessionStats.swift in Sources */,
+				B87FDB49235306870052C393 /* FileStat.swift in Sources */,
+				B87FDB43235306870052C393 /* MagnetURL.swift in Sources */,
+				B87FDB4E235306A20052C393 /* Bencode.swift in Sources */,
+				B87FDB42235306870052C393 /* GlobalFunctions.swift in Sources */,
+				B87FDB4C235306870052C393 /* SessionConfig.swift in Sources */,
+				B8E956942362758800EEF13A /* RPCRequests.swift in Sources */,
+				B87FDB40235306870052C393 /* FSDirectory.swift in Sources */,
+				B87FDB41235306870052C393 /* FSItem.swift in Sources */,
+				B87FDB3E235306870052C393 /* JSONStructures.swift in Sources */,
+				B87FDB4F235306A20052C393 /* BencodeAccessors.swift in Sources */,
+				B87FDB53235306A20052C393 /* BencoderError.swift in Sources */,
+				B87FDB46235306870052C393 /* RPCSession-Ext.swift in Sources */,
+				B87FDB51235306A20052C393 /* BencodeKey.swift in Sources */,
+				B87FDB44235306870052C393 /* RPCConfigValues.swift in Sources */,
+				B87FDB52235306A20052C393 /* Bencoder.swift in Sources */,
+				B87FDB54235306A20052C393 /* BencodeSequence.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B87FDBD62355160F0052C393 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B87FDBFA2355166C0052C393 /* Extensions.swift in Sources */,
+				B87FDBF0235516510052C393 /* TorrentFile.swift in Sources */,
+				B87FDBF52355166C0052C393 /* BencodeDescription.swift in Sources */,
+				B87FDBE4235516510052C393 /* FSDirectory.swift in Sources */,
+				B87FDBE5235516510052C393 /* FSItem.swift in Sources */,
+				B87FDBE7235516510052C393 /* JSONStructures.swift in Sources */,
+				B87FDBEB235516510052C393 /* RPCSession-Ext.swift in Sources */,
+				B87FDBEA235516510052C393 /* RPCConfigValues.swift in Sources */,
+				B87FDBED235516510052C393 /* SessionConfig.swift in Sources */,
+				B87FDBE6235516510052C393 /* GlobalFunctions.swift in Sources */,
+				B87FDBF32355166C0052C393 /* Bencode.swift in Sources */,
+				B87FDBEC235516510052C393 /* RPCSession.swift in Sources */,
+				B87FDBEE235516510052C393 /* SessionStats.swift in Sources */,
+				B8E956952362758800EEF13A /* RPCRequests.swift in Sources */,
+				B87FDBEF235516510052C393 /* Torrent.swift in Sources */,
+				B87FDBE3235516510052C393 /* FileStat.swift in Sources */,
+				B87FDBF1235516510052C393 /* Tracker.swift in Sources */,
+				B87FDBF42355166C0052C393 /* BencodeAccessors.swift in Sources */,
+				B87FDBF82355166C0052C393 /* BencoderError.swift in Sources */,
+				B87FDBE8235516510052C393 /* MagnetURL.swift in Sources */,
+				B87FDBF62355166C0052C393 /* BencodeKey.swift in Sources */,
+				B87FDBE9235516510052C393 /* Peer.swift in Sources */,
+				B87FDBF72355166C0052C393 /* Bencoder.swift in Sources */,
+				B87FDBF92355166C0052C393 /* BencodeSequence.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3D222D74D6300C80EEE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B843947122E50E3E00946F69 /* BencoderError.swift in Sources */,
+				B843947222E50E3E00946F69 /* BencodeDescription.swift in Sources */,
+				B8E3F40122D74E4300C80EEE /* TorrentFile.swift in Sources */,
+				B8E3F40322D74E4300C80EEE /* MagnetURL.swift in Sources */,
+				B8E3F40D22D74E4300C80EEE /* GlobalFunctions.swift in Sources */,
+				B843946E22E50E3E00946F69 /* BencodeSequence.swift in Sources */,
+				B8E3F40922D74E4300C80EEE /* SessionConfig.swift in Sources */,
+				B8E3F40022D74E4300C80EEE /* Tracker.swift in Sources */,
+				B843947422E50E3E00946F69 /* Bencode.swift in Sources */,
+				B8E3F40A22D74E4300C80EEE /* FileStat.swift in Sources */,
+				B843947022E50E3E00946F69 /* BencodeAccessors.swift in Sources */,
+				B8E3F40822D74E4300C80EEE /* FSDirectory.swift in Sources */,
+				B8E3F40522D74E4300C80EEE /* RPCSession.swift in Sources */,
+				B8181AAA235BD25D001637FE /* RPCRequests.swift in Sources */,
+				B843947522E50E3E00946F69 /* Extensions.swift in Sources */,
+				B8E3F40222D74E4300C80EEE /* RPCConfigValues.swift in Sources */,
+				B843946F22E50E3E00946F69 /* BencodeKey.swift in Sources */,
+				B8E3F40B22D74E4300C80EEE /* Torrent.swift in Sources */,
+				B87FDB2B2352FF160052C393 /* JSONStructures.swift in Sources */,
+				B843947322E50E3E00946F69 /* Bencoder.swift in Sources */,
+				B8487A6023514ED500929CD6 /* RPCSession-Ext.swift in Sources */,
+				B843947722E50E6C00946F69 /* FSItem.swift in Sources */,
+				B843947922E51CCF00946F69 /* SessionStats.swift in Sources */,
+				B8E3F40422D74E4300C80EEE /* Peer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B8E3F3DB22D74D6300C80EEE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B8E3F3E522D74D6300C80EEE /* TransmissionRPCTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B8E3F3E222D74D6300C80EEE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B8E3F3D522D74D6300C80EEE /* TransmissionRPC_iOS */;
+			targetProxy = B8E3F3E122D74D6300C80EEE /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		B87FDB3B235306570052C393 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 201;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = TransmissionRPC/Info_macOS.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = TransmissionRPC;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				UNEXPORTED_SYMBOLS_FILE = "";
+				VALID_ARCHS = x86_64;
+			};
+			name = Debug;
+		};
+		B87FDB3C235306570052C393 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 201;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = TransmissionRPC/Info_macOS.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = TransmissionRPC;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				UNEXPORTED_SYMBOLS_FILE = "";
+				VALID_ARCHS = x86_64;
+			};
+			name = Release;
+		};
+		B87FDBE02355160F0052C393 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 201;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = TransmissionRPC/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = johnnyvega.TransmissionRPC;
+				PRODUCT_NAME = TransmissionRPC;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		B87FDBE12355160F0052C393 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 201;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = TransmissionRPC/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = johnnyvega.TransmissionRPC;
+				PRODUCT_NAME = TransmissionRPC;
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		B8E3F3E822D74D6300C80EEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				UNEXPORTED_SYMBOLS_FILE = "";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		B8E3F3E922D74D6300C80EEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = NO;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				UNEXPORTED_SYMBOLS_FILE = "";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
+		B8E3F3EB22D74D6300C80EEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 201;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = TransmissionRPC/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = johnnyvega.TransmissionRPC;
+				PRODUCT_NAME = TransmissionRPC;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
+			};
+			name = Debug;
+		};
+		B8E3F3EC22D74D6300C80EEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 201;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INFOPLIST_FILE = TransmissionRPC/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 2.0;
+				PRODUCT_BUNDLE_IDENTIFIER = johnnyvega.TransmissionRPC;
+				PRODUCT_NAME = TransmissionRPC;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s x86_64";
+			};
+			name = Release;
+		};
+		B8E3F3EE22D74D6300C80EEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				INFOPLIST_FILE = TransmissionRPCTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = johnnyvega.TransmissionRPCTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B8E3F3EF22D74D6300C80EEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 6ZSHLT264F;
+				INFOPLIST_FILE = TransmissionRPCTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = johnnyvega.TransmissionRPCTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B87FDB3A235306570052C393 /* Build configuration list for PBXNativeTarget "TransmissionRPC_macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B87FDB3B235306570052C393 /* Debug */,
+				B87FDB3C235306570052C393 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B87FDBDF2355160F0052C393 /* Build configuration list for PBXNativeTarget "TransmissionRPC_macOSCatalyst" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B87FDBE02355160F0052C393 /* Debug */,
+				B87FDBE12355160F0052C393 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B8E3F3D022D74D6300C80EEE /* Build configuration list for PBXProject "TransmissionRPC" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8E3F3E822D74D6300C80EEE /* Debug */,
+				B8E3F3E922D74D6300C80EEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B8E3F3EA22D74D6300C80EEE /* Build configuration list for PBXNativeTarget "TransmissionRPC_iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8E3F3EB22D74D6300C80EEE /* Debug */,
+				B8E3F3EC22D74D6300C80EEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B8E3F3ED22D74D6300C80EEE /* Build configuration list for PBXNativeTarget "TransmissionRPCTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B8E3F3EE22D74D6300C80EEE /* Debug */,
+				B8E3F3EF22D74D6300C80EEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B8E3F3CD22D74D6300C80EEE /* Project object */;
+}
