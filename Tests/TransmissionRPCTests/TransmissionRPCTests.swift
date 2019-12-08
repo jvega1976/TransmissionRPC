@@ -5,7 +5,9 @@
 //  Created by  on 7/11/19.
 //
 
+#if !os(macOS)
 import UIKit
+#endif
 import XCTest
 @testable import TransmissionRPC
 
