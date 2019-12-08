@@ -7,7 +7,7 @@
 
 import UIKit
 import XCTest
-@testable import UITransmissionRPC
+@testable import TransmissionRPC
 
 
 class TransmissionRPCTests: XCTestCase {
