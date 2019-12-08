@@ -19,9 +19,8 @@
 - (void)setUp {
     // Put setup code here. This method is called before the invocation of each test method in the class.
     NSURL *url = [NSURL URLWithString:@"http://jvega:Nmjcup0112*@diskstation.johnnyvega.net:9091/transmission/rpc"];
-    [RPCConnector.sharedConnector initWithURL:url requestTimeout:5 andDelegate:self];
+    [RPCConnector.sharedConnector initWithURL:url requestTimeout:10];
     _connector = [RPCConnector sharedConnector];
-    _connector.delegate = self;
     
 }
 

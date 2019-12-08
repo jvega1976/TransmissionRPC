@@ -15,12 +15,15 @@
 
 @interface TRInfos : NSObject
 
-+ (TRInfos*)sharedTRInfos;
++ (TRInfos*)shared;
 
-+ (TRInfos*)init;
++ (TRInfos*)initWithArrayOfJSON:(NSArray*)jsonArray;
 
--(void) setInfosFromArrayOfJSON:(NSArray*)jsonArray;
--(void) updateInfosWithArrayofJSON:(NSArray*)jsonArray;
+- (instancetype)init;
+- (instancetype)initWithArrayOfJSON:(NSArray*)jsonArray;
+
+- (void) setInfosFromArrayOfJSON:(NSArray*)jsonArray;
+- (void) updateInfosWithArrayofJSON:(NSArray*)jsonArray;
 
 @property(nonatomic) NSMutableArray<TRInfo*> *items;
 

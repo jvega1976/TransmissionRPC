@@ -30,7 +30,7 @@
 }
 
 // get all torrents and save them in array
-- (void)getAllTorrents
+- (void)getAllTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
         TR_METHOD : TR_METHODNAME_TORRENTGET,
@@ -76,22 +76,21 @@
         }
     };
    
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
     {
         // save torrents and call delegate
         NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
         
-        [TRInfos.sharedTRInfos setInfosFromArrayOfJSON:torrentsJsonDesc];
-        TRInfos *trInfos = TRInfos.sharedTRInfos;
+        [TRInfos.shared setInfosFromArrayOfJSON:torrentsJsonDesc];
 
-        if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllTorrents:)])
+        if( delegate && [delegate respondsToSelector:@selector(gotAllTorrents:)])
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate gotAllTorrents:trInfos];
+                [delegate gotAllTorrents:TRInfos.shared];
             });
     }];
 }
 
-- (void)getRecentlyActiveTorrents{
+- (void)getRecentlyActiveTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -137,19 +136,20 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
          
-         [TRInfos.sharedTRInfos updateInfosWithArrayofJSON:torrentsJsonDesc];
+         TRInfos *trInfos = [TRInfos initWithArrayOfJSON:torrentsJsonDesc];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllTorrents:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotRecentlyActiveTorrents:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllTorrents:TRInfos.sharedTRInfos];
+                 [delegate gotRecentlyActiveTorrents:trInfos];
              });
      }];
 }
+
 
 - (TRInfos*)returnAllTorrents
 {
@@ -196,13 +196,13 @@
                                                   ]
                                           }
                                   };
-    TRInfos __block *trInfos = [[TRInfos alloc] init];
+    TRInfos __block *trInfos;
     dispatch_semaphore_t  __block sema = dispatch_semaphore_create(0);
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:nil withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
         NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
-        [trInfos setInfosFromArrayOfJSON:torrentsJsonDesc];
+        trInfos = [TRInfos initWithArrayOfJSON:torrentsJsonDesc];
          dispatch_semaphore_signal(sema);
      }];
     dispatch_semaphore_wait(sema,DISPATCH_TIME_FOREVER);
@@ -211,7 +211,7 @@
 
 
 // request detailed info for torrent with id - torrentId
-- (void)getDetailedInfoForTorrentWithId:(int)torrentId
+- (void)getDetailedInfoForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
@@ -264,44 +264,44 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
          
          TRInfo *trInfo = [TRInfo infoFromJSON:[torrentsJsonDesc firstObject]];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentDetailedInfo:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentDetailedInfo:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentDetailedInfo:trInfo];
+                 [delegate gotTorrentDetailedInfo:trInfo];
              });
      }];
 }
 
-- (void)getMagnetURLforTorrentWithId:(int)torrentId
+- (void)getMagnetURLforTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{ TR_ARG_FIELDS : @[ TR_ARG_FIELDS_MAGNETLINK ],  TR_ARG_IDS : @[@(torrentId)] }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
          
          NSString *magnetUrlString = [torrentsJsonDesc firstObject][TR_ARG_FIELDS_MAGNETLINK];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotMagnetURL:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotMagnetURL:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotMagnetURL:magnetUrlString forTorrentWithId:torrentId];
+                 [delegate gotMagnetURL:magnetUrlString forTorrentWithId:torrentId];
              });
      }];
 }
 
 
-- (void)getAllPeersForTorrentWithId:(int)torrentId
-{   __strong typeof(self.delegate) delegate = _delegate;
+- (void)getAllPeersForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -310,7 +310,7 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
@@ -329,8 +329,8 @@
      }];
 }
 
-- (void)getAllFilesForTorrentWithId:(int)torrentId
-{   __strong typeof(self.delegate) delegate = _delegate;
+- (void)getAllFilesForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -339,7 +339,7 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
@@ -369,14 +369,14 @@
      }];    
 }
 
-- (void)getAllFileStatsForTorrentWithId:(int)torrentId
-{   __strong typeof(self.delegate) delegate = _delegate;
+- (void)getAllFileStatsForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{ TR_ARG_FIELDS : @[ TR_ARG_FIELDS_FILESTATS], TR_ARG_IDS : @[@(torrentId)] }
                                  };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrents = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
@@ -397,7 +397,7 @@
      }];
 }
 
-- (void)getAllTrackersForTorrentWithId:(int)torrentId
+- (void)getAllTrackersForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
@@ -407,7 +407,7 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
@@ -419,15 +419,15 @@
          for( NSDictionary *dict in trackerStats )
              [res addObject:[TrackerStat initFromJSON:dict]];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllTrackers:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAllTrackers:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllTrackers:res forTorrentWithId:torrentId];
+                 [delegate gotAllTrackers:res forTorrentWithId:torrentId];
              });
      }];
 }
 
-- (void)getPiecesBitMapForTorrent:(int)torrentId
-{   __strong typeof(self.delegate) delegate = _delegate;
+- (void)getPiecesBitMapForTorrent:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{  // __strong typeof(delegate) delegate = _delegate;
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTGET,
                                   TR_METHOD_ARGS : @{
@@ -436,7 +436,7 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTGET andHandler:^(NSDictionary *json)
      {
          // save torrents and call delegate
          NSArray *torrentsJsonDesc = json[TR_RETURNED_ARGS][TR_RETURNED_ARG_TORRENTS];
@@ -453,7 +453,7 @@
 }
 
 
-- (void)addTrackers:(NSArray*)trackerURL forTorrent:(int)torrentId
+- (void)addTrackers:(NSArray*)trackerURL forTorrent:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTSET,
@@ -463,17 +463,17 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTrackersAdded:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTrackersAdded:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTrackersAdded:trackerURL forTorrentWithId:torrentId];
+                 [delegate gotTrackersAdded:trackerURL forTorrentWithId:torrentId];
              });
      }];
 }
 
 
-- (void)removeTracker:(int)trackerId forTorrent:(int)torrentId
+- (void)removeTracker:(int)trackerId forTorrent:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTSET,
@@ -483,16 +483,16 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTrackerRemoved:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTrackerRemoved:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTrackerRemoved:trackerId forTorrentWithId:torrentId];
+                 [delegate gotTrackerRemoved:trackerId forTorrentWithId:torrentId];
              });
      }];
 }
 
-- (void)setSettings:(TRInfo *)info forTorrentWithId:(int)torrentId
+- (void)setSettings:(TRInfo *)info forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTSET,
@@ -512,136 +512,137 @@
                                           }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotSetSettingsForTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotSetSettingsForTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotSetSettingsForTorrentWithId:torrentId];
+                 [delegate gotSetSettingsForTorrentWithId:torrentId];
              });
      }];
 }
 
-- (void)stopTorrents:(NSArray*)torrentsId
+- (void)stopTorrents:(NSArray*)torrentsId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTSTOP,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentsId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSTOP andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSTOP andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllTorrentsStopped)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAllTorrentsStopped)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllTorrentsStopped];
+                 [delegate gotAllTorrentsStopped];
              });
      }];
 }
 
-- (void)stopAllTorrents
+- (void)stopAllTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_TORRENTSTOP };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSTOP andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSTOP andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAllTorrentsStopped)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAllTorrentsStopped)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAllTorrentsStopped];
+                 [delegate gotAllTorrentsStopped];
              });
      }];    
 }
 
-- (void)resumeTorrent:(NSArray*)torrentId
+- (void)resumeTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTRESUME,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTRESUME andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTRESUME andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentResumedWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentResumedWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAlltorrentsResumed];
+                 [delegate gotAlltorrentsResumed];
              });
      }];
 }
 
-- (void)resumeNowTorrent:(NSArray*)torrentId
+- (void)resumeNowTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTRESUMENOW,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTRESUMENOW andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTRESUMENOW andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentResumedWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentResumedWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAlltorrentsResumed];
+                 [delegate gotAlltorrentsResumed];
              });
      }];
 }
 
 
-- (void)resumeAllTorrents
+- (void)resumeAllTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_TORRENTRESUME };
       
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTRESUME andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTRESUME andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotAlltorrentsResumed)])
+         if( delegate && [delegate respondsToSelector:@selector(gotAlltorrentsResumed)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotAlltorrentsResumed];
+                 [delegate gotAlltorrentsResumed];
              });
      }];
 }
 
-- (void)verifyTorrent:(NSArray*)torrentId
+- (void)verifyTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTVERIFY,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTVERIFY andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTVERIFY andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsVerified)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsVerified)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsVerified];
+                 [delegate gotTorrentsVerified];
              });
      }];
 }
 
-- (void)reannounceTorrent:(NSArray*)torrentId
+- (void)reannounceTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTREANNOUNCE,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTREANNOUNCE andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTREANNOUNCE andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsReannounced)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsReannounced)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsReannounced];
+                 [delegate gotTorrentsReannounced];
              });
      }];
 }
 
-- (void)deleteTorrentWithId:(NSArray*)torrentId deleteWithData:(BOOL)deleteWithData
+- (void)deleteTorrentWithId:(NSArray*)torrentId deleteWithData:(BOOL)deleteWithData forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_TORRENTREMOVE,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId, TR_ARG_DELETELOCALDATA:@(deleteWithData) }};
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTREMOVE andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTREMOVE andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsDeleted)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsDeleted)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsDeleted];
+                 [delegate gotTorrentsDeleted];
              });
      }];
 }
 
 
-- (void)moveTorrentQueue:(NSArray*)torrentId toPosition:(NSArray*)position {
+- (void)moveTorrentQueue:(NSArray*)torrentId toPosition:(NSArray*)position forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     
     for (int i=0;i<torrentId.count;i++) {
         NSNumber *trId = [torrentId objectAtIndex:i];
@@ -649,82 +650,86 @@
         NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_TORRENTSET,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : trId, TR_ARG_FIELDS_QUEUEPOSITION:pos}};
          NSLog(@"%@",requestVals);
-        [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTREMOVE andHandler:^(NSDictionary *json)
+        [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTREMOVE andHandler:^(NSDictionary *json)
          {
              NSLog(@"%@",json);
          }];
     }
-    if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsMoved)])
+    if( delegate && [delegate respondsToSelector:@selector(gotTorrentsMoved)])
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate gotTorrentsMoved];
+            [delegate gotTorrentsMoved];
         });
 }
 
-- (void)moveTorrentUp:(NSArray*)torrentId {
+- (void)moveTorrentUp:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTUP,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTUP andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTUP andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsMoved)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsMoved)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsMoved];
+                 [delegate gotTorrentsMoved];
              });
      }];
 }
 
 
-- (void)moveTorrentDown:(NSArray*)torrentId {
+- (void)moveTorrentDown:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTDOWN,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTDOWN andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTDOWN andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsMoved)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsMoved)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsMoved];
+                 [delegate gotTorrentsMoved];
              });
      }];
 }
 
 
-- (void)moveTorrentTop:(NSArray*)torrentId {
+- (void)moveTorrentTop:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTTOP,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTTOP andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTTOP andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsMoved)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsMoved)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsMoved];
+                 [delegate gotTorrentsMoved];
              });
      }];
 }
 
 
-- (void)moveTorrentBottom:(NSArray*)torrentId {
+- (void)moveTorrentBottom:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTBOTTOM,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : torrentId }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTBOTTOM andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTBOTTOM andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentsMoved)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentsMoved)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentsMoved];
+                 [delegate gotTorrentsMoved];
              });
      }];
 }
 
 
-- (void)addTorrentWithFile:(TorrentFile*)torrentFile priority:(int)priority startImmidiately:(BOOL)startImmidiately
+- (void)addTorrentWithFile:(TorrentFile*)torrentFile priority:(int)priority startImmidiately:(BOOL)startImmidiately forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSString *base64content = [torrentFile.torrentData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
     
@@ -739,11 +744,11 @@
                                                       TR_ARG_PAUSEONADD: startImmidiately ? @(NO):@(YES) }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTADD andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTADD andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentAddedWithResult:json];
+                 [delegate gotTorrentAddedWithResult:json];
              });
      }];
     
@@ -751,7 +756,7 @@
 
 
 
-- (void)addTorrentWithData:(NSData *)data priority:(int)priority startImmidiately:(BOOL)startImmidiately
+- (void)addTorrentWithData:(NSData *)data priority:(int)priority startImmidiately:(BOOL)startImmidiately forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSString *base64content = [data base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
     
@@ -762,29 +767,29 @@
                                                       TR_ARG_PAUSEONADD: startImmidiately ? @(NO):@(YES) }	
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTADD andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTADD andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentAddedWithResult:json];
+                 [delegate gotTorrentAddedWithResult:json];
              });
      }];
 
 }
 
 
-- (void)renameTorrent:(int)torrentId withName:(NSString *)name andPath:(NSString *)path
+- (void)renameTorrent:(int)torrentId withName:(NSString *)name andPath:(NSString *)path forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTSETNAME,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : @[@(torrentId)], TR_ARG_FIELDS_NAME : name, TR_ARG_FIELDS_PATH: path }
                                   };
     NSLog(@"%@",requestVals);
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSETNAME andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSETNAME andHandler:^(NSDictionary *json)
      {   NSLog(@"%@",json);
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentRenamed:withName:andPath:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentRenamed:withName:andPath:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentRenamed:torrentId withName:name andPath:path];
+                 [delegate gotTorrentRenamed:torrentId withName:name andPath:path];
              });
      }];
 }
@@ -794,7 +799,7 @@
 - (void)addTorrentWithData:(NSData *)data
                   priority:(int)priority
           startImmidiately:(BOOL)startImmidiately
-           indexesUnwanted:(NSArray*)idxUnwanted
+           indexesUnwanted:(NSArray*)idxUnwanted forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSString *base64content = [data base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength];
     
@@ -807,17 +812,17 @@
                                                     }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTADD andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTADD andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotTorrentAddedWithResult:json];
+                 [delegate gotTorrentAddedWithResult:json];
              });
      }];
     
 }
 
-- (void)addTorrentWithMagnet:(NSString *)magnetURLString priority:(int)priority startImmidiately:(BOOL)startImmidiately
+- (void)addTorrentWithMagnet:(NSString *)magnetURLString priority:(int)priority startImmidiately:(BOOL)startImmidiately forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {    
     NSDictionary *requestVals = @{
                                   TR_METHOD : TR_METHODNAME_TORRENTADD,
@@ -826,78 +831,78 @@
                                                       TR_ARG_PAUSEONADD: startImmidiately ? @(NO):@(YES) }
                                   };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTADDURL andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTADDURL andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentAddedWithMagnet:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotTorrentAddedWithMagnet:)])
          {
              dispatch_async(dispatch_get_main_queue(), ^
              {
-                 [self.delegate gotTorrentAddedWithMagnet:magnetURLString];
+                 [delegate gotTorrentAddedWithMagnet:magnetURLString];
              });
          }
-         else if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
+         else if( delegate && [delegate respondsToSelector:@selector(gotTorrentAddedWithResult:)])
          {
              dispatch_async(dispatch_get_main_queue(), ^
              {
-                 [self.delegate gotTorrentAddedWithResult:json];
+                 [delegate gotTorrentAddedWithResult:json];
              });
          }
      }];
     
 }
 
-- (void)stopDownloadingFilesWithIndexes:(NSArray *)indexes forTorrentWithId:(int)torrentId
+- (void)stopDownloadingFilesWithIndexes:(NSArray *)indexes forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_TORRENTSET,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : @[@(torrentId)], TR_ARG_FIELDS_FILES_UNWANTED : indexes } };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotFilesStoppedToDownload:forTorrentWithId:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotFilesStoppedToDownload:forTorrentWithId:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotFilesStoppedToDownload:indexes forTorrentWithId:torrentId];
+                 [delegate gotFilesStoppedToDownload:indexes forTorrentWithId:torrentId];
              });
      }];
 }
 
-- (void)resumeDownloadingFilesWithIndexes:(NSArray *)indexes forTorrentWithId:(int)torrentId
+- (void)resumeDownloadingFilesWithIndexes:(NSArray *)indexes forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_TORRENTSET,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : @[@(torrentId)], TR_ARG_FIELDS_FILES_WANTED : indexes } };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
      {
-                  if( self.delegate && [self.delegate respondsToSelector:@selector(gotFilesResumedToDownload:forTorrentWithId:)])
+                  if( delegate && [delegate respondsToSelector:@selector(gotFilesResumedToDownload:forTorrentWithId:)])
                       dispatch_async(dispatch_get_main_queue(), ^{
-                          [self.delegate gotFilesResumedToDownload:indexes forTorrentWithId:torrentId];
+                          [delegate gotFilesResumedToDownload:indexes forTorrentWithId:torrentId];
                       });
      }];
 }
 
-- (void)setPriority:(int)priority forFilesWithIndexes:(NSArray *)indexes forTorrentWithId:(int)torrentId
+- (void)setPriority:(int)priority forFilesWithIndexes:(NSArray *)indexes forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSArray *argNames = @[TR_ARG_FIELDS_FILES_PRIORITY_LOW, TR_ARG_FIELDS_FILES_PRIORITY_NORMAL, TR_ARG_FIELDS_FILES_PRIORITY_HIGH];
     
     NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_TORRENTSET,
                                   TR_METHOD_ARGS : @{ TR_ARG_IDS : @[@(torrentId)], argNames[priority + 1] : indexes } };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_TORRENTSET andHandler:^(NSDictionary *json)
      {
          dispatch_async(dispatch_get_main_queue(), ^{
-            [self getAllFilesForTorrentWithId:torrentId];
+            [self getAllFilesForTorrentWithId:torrentId forDelegate:delegate];
          });
-         //         if( self.delegate && [self.delegate respondsToSelector:@selector(gotTorrentDeletedWithId:)])
+         //         if( delegate && [delegate respondsToSelector:@selector(gotTorrentDeletedWithId:)])
          //             dispatch_async(dispatch_get_main_queue(), ^{
-         //                 [self.delegate gotTorrentDeletedWithId:torrentId];
+         //                 [delegate gotTorrentDeletedWithId:torrentId];
          //             });
      }];
 }
 
-- (void)getSessionInfo
-{   __strong typeof(self.delegate) delegate = _delegate;
+- (void)getSessionInfoForDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{  // __strong typeof(delegate) delegate = _delegate;
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONGET };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONGET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_SESSIONGET andHandler:^(NSDictionary *json)
     {
          NSDictionary *sessionJSON = json[TR_RETURNED_ARGS];
         [TRSessionInfo setSharedTRSessionInfo:sessionJSON];
@@ -911,11 +916,11 @@
     }];    
 }
 
-- (void)getSessionStats
-{   __strong typeof(self.delegate) delegate = _delegate;
+- (void)getSessionStatsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate
+{  // __strong typeof(delegate) delegate = _delegate;
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONSTATS };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONSTATS andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_SESSIONSTATS andHandler:^(NSDictionary *json)
      {
          NSDictionary *sessionJSON = json[TR_RETURNED_ARGS];
          TRSessionStats *sessionStats = [TRSessionStats sessionStatsFromJSON:sessionJSON];
@@ -927,22 +932,22 @@
      }];
 }
 
-- (void)setSessionWithSessionInfo:(TRSessionInfo *)info
+- (void)setSessionWithSessionInfo:(TRSessionInfo *)info forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONSET, TR_METHOD_ARGS : info.jsonForRPC };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals forDelegate:delegate withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json)
      {
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotSessionSetWithInfo:)] )
+         if( delegate && [delegate respondsToSelector:@selector(gotSessionSetWithInfo:)] )
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotSessionSetWithInfo: info];
+                 [delegate gotSessionSetWithInfo: info];
                  //[self getSessionInfo];
              });
      }];
 }
 
 // if rateKBs is 0 - limit is disabled
-- (void)limitDownloadRateWithSpeed:(int)rateKbs
+- (void)limitDownloadRateWithSpeed:(int)rateKbs forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     BOOL isEnabled = rateKbs > 0;
     
@@ -956,13 +961,13 @@
     
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONSET, TR_METHOD_ARGS : args };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json){
-        [self getSessionInfo];
+    [self makeRequest:requestVals  forDelegate:delegate withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json){
+        [self getSessionInfoForDelegate:delegate];
     }];
 }
 
 // if rateKBs si 0 - limit is disabled
-- (void)limitUploadRateWithSpeed:(int)rateKbs
+- (void)limitUploadRateWithSpeed:(int)rateKbs forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     BOOL isEnabled = rateKbs > 0;
    
@@ -976,33 +981,33 @@
     
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONSET, TR_METHOD_ARGS : args };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json){
-        [self getSessionInfo];
+    [self makeRequest:requestVals  forDelegate:delegate withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json){
+        [self getSessionInfoForDelegate:delegate];
     }];
 }
 
 /// toggle alternative limits mode
-- (void)toggleAltLimitMode:(BOOL)altLimitsEnabled
+- (void)toggleAltLimitMode:(BOOL)altLimitsEnabled forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_SESSIONSET,
                                    TR_METHOD_ARGS : @{ TR_ARG_SESSION_ALTLIMITRATEENABLED : @(altLimitsEnabled) } };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals  forDelegate:delegate withName:TR_METHODNAME_SESSIONSET andHandler:^(NSDictionary *json)
     {
-        if( self.delegate && [self.delegate respondsToSelector:@selector(gotToggledAltLimitMode:)] )
+        if( delegate && [delegate respondsToSelector:@selector(gotToggledAltLimitMode:)] )
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self.delegate gotToggledAltLimitMode:altLimitsEnabled];
+                [delegate gotToggledAltLimitMode:altLimitsEnabled];
             });
     }];
 }
 
-- (void)getFreeSpaceWithDownloadDir:(NSString *)downloadDir
+- (void)getFreeSpaceWithDownloadDir:(NSString *)downloadDir forDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
-    __strong typeof(self.delegate) delegate = _delegate;
+    //__strong typeof(delegate) delegate = _delegate;
     NSDictionary *requestVals = @{TR_METHOD : TR_METHODNAME_FREESPACE,
                                   TR_METHOD_ARGS : @{ TR_ARG_FREESPACEPATH : downloadDir } };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_FREESPACE andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals  forDelegate:delegate withName:TR_METHODNAME_FREESPACE andHandler:^(NSDictionary *json)
      {
          long long freeSizeBytes = [(NSNumber*)(json[TR_RETURNED_ARGS][TR_ARG_FREESPACESIZE]) longLongValue];
 
@@ -1017,23 +1022,23 @@
      }];
 }
 
-- (void)portTest
+- (void)portTestforDelegate:(id<RPCConnectorDelegate>) __strong  delegate
 {
     NSDictionary *requestVals = @{ TR_METHOD : TR_METHODNAME_TESTPORT };
     
-    [self makeRequest:requestVals withName:TR_METHODNAME_TESTPORT andHandler:^(NSDictionary *json)
+    [self makeRequest:requestVals  forDelegate:delegate withName:TR_METHODNAME_TESTPORT andHandler:^(NSDictionary *json)
      {
          BOOL portIsOpen = [(NSNumber*)(json[TR_RETURNED_ARGS][TR_ARG_PORTTESTPORTISOPEN]) boolValue];
          
-         if( self.delegate && [self.delegate respondsToSelector:@selector(gotPortTestedWithSuccess:)])
+         if( delegate && [delegate respondsToSelector:@selector(gotPortTestedWithSuccess:)])
              dispatch_async(dispatch_get_main_queue(), ^{
-                 [self.delegate gotPortTestedWithSuccess:portIsOpen];
+                 [delegate gotPortTestedWithSuccess:portIsOpen];
              });
      }];
 }
 
 // perform request with JSON body and handler
-- (void)makeRequest:(NSDictionary*)requestDict withName:(NSString*)requestName andHandler:( void (^)( NSDictionary* )) dataHandler
+- (void)makeRequest:(NSDictionary*)requestDict forDelegate:(id<RPCConnectorDelegate>)delegate withName:(NSString*)requestName andHandler:( void (^)( NSDictionary* )) dataHandler
 {
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:_url];
     req.HTTPMethod = HTTP_REQUEST_METHOD;
@@ -1062,7 +1067,7 @@
         {   NSMutableString *message = [NSMutableString stringWithFormat:@"%@",error.localizedDescription];
             if(requestDict[@"ids"])
                 [message appendFormat:@" - %@",requestDict[@"ids"]];
-            [self sendErrorMessage:message fromURL:req.URL toDelegateWithRequestMethodName:requestName];
+            [self sendErrorMessage:message fromURL:req.URL toDelegate:delegate withRequestMethodName:requestName];
         }
         else
         {
@@ -1080,12 +1085,13 @@
                     else if( statusCode == HTTP_RESPONSE_NEED_X_TRANS_ID )
                     {
                         self.xTransSessionId = httpResponse.allHeaderFields[HTTP_XTRANSID_HEADER];
-                        [self makeRequest:requestDict withName:requestName andHandler:dataHandler];
+                        [self makeRequest:requestDict forDelegate:delegate withName:requestName andHandler:dataHandler];
                         return;
                     }
                     
                     [self sendErrorMessage:[NSString stringWithFormat:@"%li %@", (long)statusCode, self.lastErrorMessage] fromURL:req.URL
-                          toDelegateWithRequestMethodName:requestName];
+                                toDelegate: delegate
+                          withRequestMethodName:requestName];
                 }
                 else
                 {
@@ -1095,7 +1101,7 @@
                     if( !ansJSON )
                     {
                         [self sendErrorMessage:NSLocalizedString(@"Server response wrong data", @"") fromURL:req.URL
-                              toDelegateWithRequestMethodName:requestName];
+                                    toDelegate:delegate withRequestMethodName:requestName];
                     }
                     // JSON is OK, trying to retrieve result of request it should be TR_RESULT_SUCCEED
                     else
@@ -1104,12 +1110,12 @@
                         if( !result )
                         {
                             [self sendErrorMessage:NSLocalizedString(@"Server failed to return data", @"") fromURL:req.URL
-                                  toDelegateWithRequestMethodName:requestName];
+                                        toDelegate:delegate withRequestMethodName:requestName];
                         }
                         else if( ![result isEqualToString: TR_RESULT_SUCCEED] )
                         {
                             [self sendErrorMessage:[NSString stringWithFormat:NSLocalizedString(@"Server failed to return data: %@", @""), result] fromURL:req.URL
-                                  toDelegateWithRequestMethodName:requestName];
+                                  toDelegate:delegate withRequestMethodName:requestName];
                         }
                         else
                         {
@@ -1132,23 +1138,22 @@
         [_task cancel];
 }
 
-- (void)sendErrorMessage:(NSString*)message fromURL:(NSURL*)url toDelegateWithRequestMethodName:(NSString*)methodName
+- (void)sendErrorMessage:(NSString*)message fromURL:(NSURL*)url toDelegate:(id<RPCConnectorDelegate>)delegate withRequestMethodName:(NSString*)methodName
 {
     _lastErrorMessage = message;
-    if( self.delegate && [self.delegate respondsToSelector:@selector(connector:complitedRequestName:fromURL:withError:)])
+    if( delegate && [delegate respondsToSelector:@selector(connector:completedRequestName:fromURL:withError:)])
     {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self.delegate connector:self complitedRequestName:methodName fromURL:url withError:message ];
+            [delegate connector:self completedRequestName:methodName fromURL:url withError:message ];
         });
     }
 }
 
 
-- (void)initWithURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate
+- (void)initWithURL:(NSURL*)url requestTimeout:(int)timeout
 {
     [self stopRequests];
     _url = url;
-    _delegate = delegate;
     _requestTimeout = timeout;
     
     // create nsurlsession with our config parameters
@@ -1165,7 +1170,6 @@
         NSData *data = [authStringToEncode64 dataUsingEncoding:NSUTF8StringEncoding];
         _authString = [NSString stringWithFormat:@"Basic %@", [data base64EncodedStringWithOptions:0]];
     }
-    _delegate = nil;
     //[self getSessionInfo];
 }
 
@@ -1183,12 +1187,11 @@
 }
 
 
-- (instancetype)initWithtURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate
+- (instancetype)initWithtURL:(NSURL*)url requestTimeout:(int)timeout
 {
     self = [super init];
     if(self) {
         _url = url;
-        _delegate = delegate;
         _requestTimeout = timeout;
         
         // create nsurlsession with our config parameters
@@ -1205,7 +1208,6 @@
             NSData *data = [authStringToEncode64 dataUsingEncoding:NSUTF8StringEncoding];
             _authString = [NSString stringWithFormat:@"Basic %@", [data base64EncodedStringWithOptions:0]];
         }
-        _delegate = nil;
     }
     return self;
 }

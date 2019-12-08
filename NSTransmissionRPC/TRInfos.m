@@ -18,7 +18,6 @@
 @end
 
 @implementation TRInfos
-
 {
     NSMutableDictionary *_chache;
     long long           _totalUploadRate;
@@ -27,7 +26,7 @@
 }
 
 
-+ (TRInfos*)sharedTRInfos {
++ (TRInfos*)shared {
     
     static TRInfos* _inst;
     
@@ -39,26 +38,40 @@
     return _inst;
 }
 
-+ (TRInfos*)init {
-    TRInfos *infos = [[TRInfos alloc] init];
-    return infos;
-}
 
-// close init method
 - (instancetype)init
 {
-    self = [super init];
-    
-    if( self )
-    {
+    if(self = [super init])
         _items = [NSMutableArray array];
-        _chache = [NSMutableDictionary dictionary];
-    }
-    
     return self;
 }
 
-// init from array of json objects
+
++ (TRInfos*)initWithArrayOfJSON:(NSArray*)jsonArray {
+    TRInfos *infos = [[TRInfos alloc] initWithArrayOfJSON:jsonArray];
+    return infos;
+}
+
+
+- (instancetype)initWithArrayOfJSON:(NSArray*)jsonArray
+{
+    self = [super init];
+    
+    if( self ) {
+        NSMutableArray *items = [NSMutableArray array];
+        NSTimeInterval time = [[NSDate date] timeIntervalSince1970];
+        for( NSDictionary* d in jsonArray)
+            [items addObject: [TRInfo infoFromJSON:d]];
+        NSTimeInterval newTime = [[NSDate date] timeIntervalSince1970] - time;
+        NSLog(@"time: %f", newTime);
+        NSArray *sortdescs = [NSArray arrayWithObjects:[[NSSortDescriptor sortDescriptorWithKey:@"queuePosition" ascending:YES] reversedSortDescriptor],nil];
+        [items sortUsingDescriptors:sortdescs];
+        _items = items;
+    }
+    return self;
+}
+
+
 - (void)setInfosFromArrayOfJSON:(NSArray*)jsonArray
 {
     NSMutableArray *items = [NSMutableArray array];
@@ -69,7 +82,8 @@
     _items = items;
 }
 
--(void) updateInfosWithArrayofJSON:(NSArray*)jsonArray {
+
+-(void)updateInfosWithArrayofJSON:(NSArray*)jsonArray {
     NSArray *sortdescs = [NSArray arrayWithObjects:[[NSSortDescriptor sortDescriptorWithKey:@"trId" ascending:YES] reversedSortDescriptor],nil];
     [_items sortUsingDescriptors:sortdescs];
     for( NSDictionary* d in jsonArray) {

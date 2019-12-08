@@ -18,8 +18,9 @@
 
 @protocol RPCConnectorDelegate <NSObject>
 
-@optional - (void)connector:(RPCConnector *)cn complitedRequestName:(NSString*)requestName fromURL:(NSURL*)url withError:(NSString*)errorMessage;
+@optional - (void)connector:(RPCConnector *)cn completedRequestName:(NSString*)requestName fromURL:(NSURL*)url withError:(NSString*)errorMessage;
 @optional - (void)gotAllTorrents:(TRInfos *)trInfos;
+@optional - (void)gotRecentlyActiveTorrents:(TRInfos *)trInfos;
 @optional - (void)gotTorrentDetailedInfo:(TRInfo*)torrentInfo;
 @optional - (void)gotTorrentStopped;
 @optional - (void)gotTorrentResumedWithId:(int)torrentId;
@@ -56,7 +57,6 @@
 @interface RPCConnector : NSObject
 
 @property(nonatomic) NSString *lastErrorMessage;
-@property (weak) id<RPCConnectorDelegate> delegate;
 @property (strong, nonatomic) NSURL *url;
 @property (nonatomic) int requestTimeout;
 @property (strong, nonatomic) TRSessionInfo *sessionInfo;
@@ -66,20 +66,18 @@
  Method to update the RPCConnector properties.  Mainly used to initialize the shared connector.
  @param url - NSURL object with connection session information
  @param timeout - session request timeout (in seconds)
- @param delegate - delegate for RPCconnector
  */
-- (void)initWithURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate;
+- (void)initWithURL:(NSURL*)url requestTimeout:(int)timeout;
 
 
 /*!
  Object instance initializer
  @param url - NSURL object with connection session information
  @param timeout - session request timeout (in seconds)
- @param delegate - delegate for RPCconnector
  @return RPCConnector instance initialized with session configuration according to passed parameters values
  */
 
-- (instancetype)initWithtURL:(NSURL*)url requestTimeout:(int)timeout andDelegate:(id<RPCConnectorDelegate>)delegate;
+- (instancetype)initWithtURL:(NSURL*)url requestTimeout:(int)timeout;
 
 
 /*!
@@ -92,12 +90,12 @@
 /*!
  Method to request information for all Torrents.  You must implement the gotAllTorrents method of the RPCConnectorDelegate protocol to obtain the returned Torrents info.
  */
-- (void)getAllTorrents;
+- (void)getAllTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 /*!
  Method to request information for only recently active Torrents.  You must implement the gotAllTorrents method of the RPCConnectorDelegate protocol to obtain the returned Torrents info.
  */
-- (void)getRecentlyActiveTorrents;
+- (void)getRecentlyActiveTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 
 /*!
@@ -110,7 +108,7 @@
     Method to request the detailed information for a particular Torrent.  You must implement the gotTorrentDetailedInfo method of the RPCConnectorDelegate protocol to obtain the returned Torrent detailed info.
     @param torrentId - Torrent Id
  */
-- (void)getDetailedInfoForTorrentWithId:(int)torrentId;
+- (void)getDetailedInfoForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 
 /*!
@@ -120,61 +118,61 @@
 
 
 
-- (void)toggleAltLimitMode:(BOOL)altLimitsEnabled;
+- (void)toggleAltLimitMode:(BOOL)altLimitsEnabled forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 
 /*!
     Method to stop the current action (download, seed, wait, etc.) for a collection of Torrents.  Optionally, you can implement the gotTorrentsStopped method of the RPCConnectorDelegate protocol to take any action necessary action after the request was completed.
  @param torrentsId - Array of Torrents Ids to request the stop action
  */
-- (void)stopTorrents:(NSArray*)torrentsId;
+- (void)stopTorrents:(NSArray*)torrentsId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 
-- (void)stopAllTorrents;
-- (void)resumeTorrent:(NSArray*)torrentId;
-- (void)resumeNowTorrent:(NSArray*)torrentId;
-- (void)resumeAllTorrents;
-- (void)verifyTorrent:(NSArray*)torrentId;
-- (void)reannounceTorrent:(NSArray*)torrentId;
-- (void)deleteTorrentWithId:(NSArray*)torrentId deleteWithData:(BOOL)deleteWithData;
-- (void)moveTorrentQueue:(NSArray*)torrentId toPosition:(NSArray*)position;
-- (void)moveTorrentUp:(NSArray*)torrentId;
-- (void)moveTorrentDown:(NSArray*)torrentId;
-- (void)moveTorrentTop:(NSArray*)torrentId;
-- (void)moveTorrentBottom:(NSArray*)torrentId;
+- (void)stopAllTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)resumeTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)resumeNowTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)resumeAllTorrentsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)verifyTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)reannounceTorrent:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)deleteTorrentWithId:(NSArray*)torrentId deleteWithData:(BOOL)deleteWithData forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)moveTorrentQueue:(NSArray*)torrentId toPosition:(NSArray*)position forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)moveTorrentUp:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)moveTorrentDown:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)moveTorrentTop:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)moveTorrentBottom:(NSArray*)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 
-- (void)addTorrentWithFile:(TorrentFile*)torrentFile priority:(int)priority startImmidiately:(BOOL)startImmidiately;
-- (void)addTorrentWithData:(NSData*)data priority:(int)priority startImmidiately:(BOOL)startImmidiately;
-- (void)addTorrentWithData:(NSData *)data priority:(int)priority startImmidiately:(BOOL)startImmidiately indexesUnwanted:(NSArray*)idxUnwanted;
+- (void)addTorrentWithFile:(TorrentFile*)torrentFile priority:(int)priority startImmidiately:(BOOL)startImmidiately forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)addTorrentWithData:(NSData*)data priority:(int)priority startImmidiately:(BOOL)startImmidiately forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)addTorrentWithData:(NSData *)data priority:(int)priority startImmidiately:(BOOL)startImmidiately indexesUnwanted:(NSArray*)idxUnwanted forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)addTorrentWithMagnet:(NSString*)magnetURLString priority:(int)priority startImmidiately:(BOOL)startImmidiately;
+- (void)addTorrentWithMagnet:(NSString*)magnetURLString priority:(int)priority startImmidiately:(BOOL)startImmidiately forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)getAllPeersForTorrentWithId:(int)torrentId;
-- (void)getAllFilesForTorrentWithId:(int)torrentId;
-- (void)getAllFileStatsForTorrentWithId:(int)torrentId;
+- (void)getAllPeersForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)getAllFilesForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)getAllFileStatsForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)getAllTrackersForTorrentWithId:(int)torrentId;
-- (void)addTrackers:(NSArray*)trackerURL forTorrent:(int)torrentId;
-- (void)removeTracker:(int)trackerId forTorrent:(int)torrentId;
+- (void)getAllTrackersForTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)addTrackers:(NSArray*)trackerURL forTorrent:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)removeTracker:(int)trackerId forTorrent:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)stopDownloadingFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId;
-- (void)resumeDownloadingFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId;
-- (void)setPriority:(int)priority forFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId;
-- (void)setSettings:(TRInfo*)settings forTorrentWithId:(int)torrentId;
+- (void)stopDownloadingFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)resumeDownloadingFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)setPriority:(int)priority forFilesWithIndexes:(NSArray*)indexes forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)setSettings:(TRInfo*)settings forTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)getSessionInfo;
-- (void)getSessionStats;
-- (void)setSessionWithSessionInfo:(TRSessionInfo*)info;
-- (void)getFreeSpaceWithDownloadDir:(NSString*)downloadDir;
-- (void)portTest;
+- (void)getSessionInfoForDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)getSessionStatsForDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)setSessionWithSessionInfo:(TRSessionInfo*)info forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)getFreeSpaceWithDownloadDir:(NSString*)downloadDir forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)portTestforDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)limitUploadRateWithSpeed:(int)rateKbs;
-- (void)limitDownloadRateWithSpeed:(int)rateKbs;
+- (void)limitUploadRateWithSpeed:(int)rateKbs forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)limitDownloadRateWithSpeed:(int)rateKbs forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
-- (void)getMagnetURLforTorrentWithId:(int)torrentId;
-- (void)renameTorrent:(int)torrentId withName:(NSString *)name andPath:(NSString *)path;
-- (void)getPiecesBitMapForTorrent:(int)torrentId;
+- (void)getMagnetURLforTorrentWithId:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)renameTorrent:(int)torrentId withName:(NSString *)name andPath:(NSString *)path forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
+- (void)getPiecesBitMapForTorrent:(int)torrentId forDelegate:(id<RPCConnectorDelegate>) __strong  delegate;
 
 @end
 
