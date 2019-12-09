@@ -17,7 +17,7 @@ public enum FilePriority: Int, Codable {
 }
 
 // MARK: - Class FSItem
-public class FSItem: NSObject {
+@objcMembers open class FSItem: NSObject {
     
     /// flag indicates that all files withing this folder is wanted
     public var allFilesWanted = false
@@ -273,7 +273,7 @@ public class FSItem: NSObject {
         
         item.level = self.level + 1
         item.parent = self
-        item.indexPath = self.indexPath.appending(self.items!.count)
+        item.indexPath = self.indexPath.appending(self.items!.count + 1)
         items!.append(item)
         
         return item

@@ -26,7 +26,7 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
 
 //MARK: - FSDirectory structure
 
-public struct FSDirectory {
+@objcMembers open class FSDirectory: NSObject {
     
     private var root: FSItem!
     private var folderItems = [AnyHashable : Any]()
@@ -35,7 +35,7 @@ public struct FSDirectory {
     /// Get count of items in directory
     private var _count = -1
     public var count: Int {
-        mutating get {
+        get {
             if _count == -1 {
                 _count = root.filesCount
             }
@@ -50,9 +50,10 @@ public struct FSDirectory {
     }
     
     /// Initializer
-    public init() {
+    public override init() {
+        super.init()
         self.root = FSItem(name: "", isFolder: true) // init root element (always folder)
-        self.root.indexPath = IndexPath()
+        self.root.indexPath = IndexPath(index: 0)
         self.folderItems = [:]
     }
     
@@ -62,7 +63,7 @@ public struct FSDirectory {
     /// - parameter fileStats: Array of JSON objects containing file statistics
     /// return: A new FSDirectory object containing all Files for one particular Torrent
     
-    public init(withJSONFileInfo files: [JSONObject], jsonFileStatInfo fileStats:[JSONObject]) {
+    convenience public init(withJSONFileInfo files: [JSONObject], jsonFileStatInfo fileStats:[JSONObject]) {
         self.init()
         for i in 0..<files.count {
             var file = files[i]
@@ -134,7 +135,7 @@ public struct FSDirectory {
         return Array(indexes.keys)
     }
     
-    public mutating func updateFSDir(usingStats fileStats:[JSONObject]) {
+    public func updateFSDir(usingStats fileStats:[JSONObject]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
             rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
@@ -143,7 +144,7 @@ public struct FSDirectory {
         }
     }
     
-    public mutating func updateFSDir(usingStats fileStats:[FileStat]) {
+    public func updateFSDir(usingStats fileStats:[FileStat]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
             rpcIndexFiles[i]?.bytesCompleted = file.bytesCompleted
@@ -153,7 +154,7 @@ public struct FSDirectory {
     }
     
     
-    public var description: String {
+    public override var description: String {
         return root!.description
     }
 }
@@ -164,7 +165,7 @@ public struct FSDirectory {
 extension FSDirectory {
     
     /// add new item to directory with file path
-    public mutating func addFilePath(_ path: String, andRpcIndex rpcIndex: Int) -> FSItem {
+    public func addFilePath(_ path: String, andRpcIndex rpcIndex: Int) -> FSItem {
         // split the path string
         let pathComponents = path.components(separatedBy: PATH_SPLITTER_STRING)
         
@@ -172,7 +173,7 @@ extension FSDirectory {
     }
     
     /// add new item to directory with separated file path
-    public mutating func addPathComonents(_ pathComponents: [String], andRpcIndex rpcIndex: Int) -> FSItem {
+    public func addPathComonents(_ pathComponents: [String], andRpcIndex rpcIndex: Int) -> FSItem {
         // add all components to the tree (from root)
         var levelItem = root
         

@@ -68,7 +68,11 @@ open class RPCSession: NSObject {
         self.authString = ""
         sessionConfig = URLSessionConfiguration.default
         sessionConfig.allowsCellularAccess = true
-        sessionConfig.allowsExpensiveNetworkAccess = true
+        if #available(iOS 13.0, *) {
+            sessionConfig.allowsExpensiveNetworkAccess = true
+        } else {
+            // Fallback on earlier versions
+        }
         #if os(iOS)
         sessionConfig.sessionSendsLaunchEvents = true
         #endif
@@ -99,7 +103,11 @@ open class RPCSession: NSObject {
         self.requestTimeout = timeout
         sessionConfig = URLSessionConfiguration.default
         sessionConfig.allowsCellularAccess = true
-        sessionConfig.allowsExpensiveNetworkAccess = true
+        if #available(iOS 13.0, *) {
+            sessionConfig.allowsExpensiveNetworkAccess = true
+        } else {
+            // Fallback on earlier versions
+        }
         #if os(iOS)
         sessionConfig.sessionSendsLaunchEvents = true
         #endif
