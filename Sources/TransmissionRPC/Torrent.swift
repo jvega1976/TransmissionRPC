@@ -65,7 +65,7 @@ public typealias trId = Int
     }
     
     public var trId: trId = 0
-    public var percentDone: Double = 0.00
+    private var percentDone: Double = 0.00
     public var name: String!
     public var status = TorrentStatus.stopped
     public var dateDone: Date?
@@ -308,7 +308,7 @@ public typealias trId = Int
     }
     
     public override func isEqual(_ object: Any?) -> Bool {
-        let trInfo = object as! Torrent
+        guard let trInfo = object as? Torrent else { return false}
         return trInfo.trId == self.trId
     }
     
