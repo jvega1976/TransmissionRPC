@@ -417,8 +417,9 @@ extension FSItem {
         }
         
         if newItem.isFolder {
-           fileInfo[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
-           newItem.addPathComponents(withJSONFileInfo: &fileInfo, jsonFileStatInfo: fileStatInfo, rpcIndex: rpcIndex)
+            fileInfo[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
+            newItem.fullName = (newItem.parent?.fullName ?? "") + (!(newItem.parent?.fullName.isEmpty ?? true) ? "/" : "") + newItem.name
+            newItem.addPathComponents(withJSONFileInfo: &fileInfo, jsonFileStatInfo: fileStatInfo, rpcIndex: rpcIndex)
 /*            if newItem.parent!.fullName != "" {
                 newItem.fullName = newItem.parent!.fullName + "/" + newItem.name
             }
