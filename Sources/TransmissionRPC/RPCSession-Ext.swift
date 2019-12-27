@@ -539,7 +539,7 @@ public extension RPCSession {
     /// This completion handler takes the following parameters:
     /// - parameter error: An error object that indicates why the request failed, or nil if the request was successful.
     ///
-    func addTorrent(usingFile torrentFile: TorrentFile, andBandwithPriority bandPriority: Int? = 0, addPaused paused: Bool, withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ error: Error?)->Void) {
+    func addTorrent(usingFile torrentFile: TorrentFile, andBandwithPriority bandPriority: Int? = 0, addPaused paused: Bool, withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ trId: TrId?, _ error: Error?)->Void) {
         
         let torrentFile = torrentFile
         let base64content = torrentFile.torrentData.base64EncodedString(options: .lineLength64Characters)
@@ -558,7 +558,7 @@ public extension RPCSession {
         
         let request = RPCRequest(forMethod: JSONKeys.torrent_add, withArguments: arguments, usingSession: self, andPriority: queuePriority, dataCompletion: { (data, error) in
                 if error != nil {
-                    completion(error)
+                    completion(nil,error)
                     return
                 }
                 do {
@@ -567,16 +567,17 @@ public extension RPCSession {
                     let response = try decoder.decode(JSONTorrentAdded.self, from: data!)
                     if response.result != "success" {
                         let error = NSError(domain: "TransmissionRemote", code: 999, userInfo: [NSLocalizedDescriptionKey: response.result])
-                        completion(error)
+                        completion(nil,error)
                     } else if response.arguments.torrentDuplicate != nil {
                         let error = NSError(domain: "TransmissionRemote", code: 999, userInfo: [NSLocalizedDescriptionKey: "Torrent is duplicated"])
-                        completion(error)
+                        completion(nil,error)
                     }
                     else {
-                        completion(nil)
+                        let trId = response.arguments.torrentAdded?.id
+                        completion(trId,nil)
                     }
                 } catch {
-                    completion(error)
+                    completion(nil,error)
                 }
             })
         request.queuePriority = queuePriority

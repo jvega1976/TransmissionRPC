@@ -18,7 +18,7 @@ private let kAnnounceKey = "announce"
 private let kAnnounceListKey = "announce-list"
 private let kEmptyString = ""
 
-public struct TorrentFile {
+open class TorrentFile: NSObject {
    private var fileData: Data!
    private var benDict: Bencode!
    public var fs: FSDirectory! // cached file list directory
@@ -28,12 +28,12 @@ public struct TorrentFile {
     /// init and return new instance of TorrentFile
     /// or nil if file can not be parsed or readed
 
-    public var name: String {
+    open var name: String {
         return benDict![kInfoKey][kNameKey].string ?? ""
     }
 
-    public var trackerList: [String] {
-        mutating get {
+    open var trackerList: [String] {
+        get {
             //if trList
             if trList != nil {
                 return trList!
@@ -64,8 +64,8 @@ public struct TorrentFile {
         }
     }
 
-    public var fileList: FSDirectory {
-        mutating get {
+    open var fileList: FSDirectory {
+        get {
             if fs != nil {
                 return fs
             }
@@ -83,7 +83,10 @@ public struct TorrentFile {
                     for i in list ?? [] {
                         array.append(i.string!)
                     }
-                    let item:FSItem = fs.addPathComonents(array, andRpcIndex: idx)
+                    let fileName = (benDict?[kInfoKey][kNameKey].string ?? "") + array.reduce("", { result, pathname in
+                            return result + "/" + pathname
+                    })
+                    let item:FSItem = fs.addFilePath(fileName, andRpcIndex: idx)
                     item.size = fileDesc[kLengthKey].int!
                     item.isWanted = true
                     item.downloadProgress = 0.0
@@ -96,14 +99,16 @@ public struct TorrentFile {
                 let item = fs.addFilePath(benDict?[kInfoKey][kNameKey].string ?? "", andRpcIndex: 0)
                 item.isWanted = true
                 item.downloadProgress = 0.0
+                item.size = info?[kLengthKey].int ?? 0
+                
             }
             
             return fs
         }
     }
 
-    public var torrentSize: Int {
-        mutating get {
+    open var torrentSize: Int {
+        get {
             if Int(trSize) != TRSIZE_NOT_DEFINED {
                 return trSize
             }
@@ -126,13 +131,13 @@ public struct TorrentFile {
         }
     }
 
-    public var torrentSizeString: String {
-        mutating get {
+    open var torrentSizeString: String {
+        get {
             return formatByteCount(torrentSize)
         }
     }
 
-    public var torrentData: Data {
+    open var torrentData: Data {
         return fileData
     }
 

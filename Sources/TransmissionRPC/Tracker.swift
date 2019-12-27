@@ -41,7 +41,7 @@ public enum TrackerState: Int, Codable
 }
 
 //MARK: - Tracker struct definition
-public struct Tracker: Codable {
+open class Tracker: NSObject, Codable {
 
     public var announce: String = ""
     public var announceState: TrackerState.RawValue = TrackerState.inactive.rawValue
@@ -70,28 +70,28 @@ public struct Tracker: Codable {
     public var seederCount: Int = 0
     public var tier: Int = 0
    
-    public var lastAnnounceTimeString: String {
+    open var lastAnnounceTimeString: String {
         return formatDateFrom1970Short(lastAnnounceTime) ?? ""
     }
-    public var lastScrapeTimeString: String {
+    open var lastScrapeTimeString: String {
         return formatDateFrom1970Short(lastScrapeTime) ?? ""
     }
-    public var nextAnnounceTimeString: String {
+    open var nextAnnounceTimeString: String {
         return formatDateFrom1970Short(nextAnnounceTime) ?? ""
     }
-    public var nextScrapeTimeString: String {
+    open var nextScrapeTimeString: String {
         return formatDateFrom1970Short(nextScrapeTime) ?? ""
     }
     
-    public var lastAnnounceStartTimeString: String {
+    open var lastAnnounceStartTimeString: String {
         return formatDateFrom1970Short(lastAnnounceStartTime) ?? ""
     }
     
-    public var lastScrapeStartTimeString: String {
+    open var lastScrapeStartTimeString: String {
         return formatDateFrom1970Short(lastScrapeStartTime) ?? ""
     }
     
-    public var announceString: String {
+    open var announceString: String {
         return TrackerState.stringValue(self.announceState)
     }
    

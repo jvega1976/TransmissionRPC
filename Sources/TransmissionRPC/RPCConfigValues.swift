@@ -6,13 +6,14 @@
 //
 //  RPC config values using in JSON requests/answers
 //
+import Foundation
 
 public typealias JSONKey = String
 public typealias JSONObject = [JSONKey: Any]
 
 
 // MARK: - Torrent status values
-public enum TorrentStatus: Int, Codable {
+@objc public enum TorrentStatus: Int, Codable {
     case stopped = 0 /* Torrent is stopped */
     case checkWait = 1 /* Queued to check files */
     case check = 2 /* Checking files */

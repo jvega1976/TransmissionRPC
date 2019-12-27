@@ -9,7 +9,7 @@
 import Foundation
 
 //MARK: - SessionStats struct definition
-public struct SessionStats: Decodable {
+open class SessionStats: NSObject, Decodable {
     
     public var activeTorrentCount = 0
     public var downloadSpeed = 0
@@ -53,7 +53,7 @@ public struct SessionStats: Decodable {
         case currentSecondsActive = "secondsActive"
     }
     
-    public init(from decoder: Decoder) throws {
+    required public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         activeTorrentCount = try values.decode(Int.self, forKey: .activeTorrentCount)
         downloadSpeed = try values.decode(Int.self, forKey: .downloadSpeed)

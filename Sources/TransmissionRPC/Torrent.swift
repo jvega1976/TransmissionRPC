@@ -18,7 +18,7 @@ public typealias trId = Int
 // MARK: - Torrent class definition
 @objcMembers open class Torrent: NSObject, Codable  {
 
-    private enum CodingKeys: String, CodingKey {
+     private enum CodingKeys: String, CodingKey, CaseIterable {
         case activityDate = "activityDate"
         case bandwidthPriority = "bandwidthPriority"
         case comment = "comment"
@@ -29,7 +29,7 @@ public typealias trId = Int
         case downloadDir = "downloadDir"
         case downloadedEver = "downloadedEver"
         case downloadLimit = "downloadLimit"
-        case downloadLimitEnabled = "downloadLimited"
+        case downloadLimited = "downloadLimited"
         case downloadRate = "rateDownload"
         case errorNumber = "error"
         case errorString = "errorString"
@@ -59,80 +59,87 @@ public typealias trId = Int
         case trId = "id"
         case uploadedEver = "uploadedEver"
         case uploadLimit = "uploadLimit"
-        case uploadLimitEnabled = "uploadLimited"
+        case uploadLimited = "uploadLimited"
         case uploadRate = "rateUpload"
         case uploadRatio = "uploadRatio"
     }
     
-    public var trId: trId = 0
-    private var percentDone: Double = 0.00
-    public var name: String!
-    public var status = TorrentStatus.stopped
-    public var dateDone: Date?
-    public var errorString: String?
-    public var activityDate: Date?
-    public var totalSize: Int = 0
-    public var downloadedEver: Int = 0
-    public var secondsDownloading: TimeInterval = 0
-    public var secondsSeeding: TimeInterval = 0
-    public var uploadRate: Int = 0
-    public var downloadRate: Int = 0
-    public var peersConnected: Int = 0
-    public var peersSendingToUs: Int = 0
-    public var peersGettingFromUs: Int = 0
-    public var uploadedEver: Int = 0
-    public var uploadRatio: Double = 0.0
-    public var hashString: String = ""
-    public var piecesCount: Int = 0
-    public var pieceSize: Int = 0
-    public var comment: String = ""
-    public var downloadDir: String = ""
-    public var errorNumber: Int = 0
-    public var creator: String = ""
-    public var dateCreated: Date?
-    public var dateAdded: Date?
-    public var haveValid: Double = 0.0
-    public var recheckProgress: Double = 0.0
-    public var bandwidthPriority: Int = 0
-    public var bandwidthPriorityString: String = ""
-    public var honorsSessionLimits: Bool = false
-    public var peerLimit: Int = 0
-    public var uploadLimitEnabled: Bool = false
-    public var uploadLimit: Int = 0
-    public var downloadLimitEnabled: Bool = false
-    public var downloadLimit: Int = 0
-    public var seedIdleMode: Int = 0
-    public var seedIdleLimit: Int = 0
-    public var seedRatioMode: Int = 0
-    public var seedRatioLimit: Double = 0
-    public var queuePosition: Int = 0
-    public var eta: Int = 0
-    public var haveUnchecked: Int = 0
+    @objc dynamic public var trId: trId = 0
+    @objc dynamic private var percentDone: Double = 0.00
+    @objc dynamic public var name: String!
+    @objc dynamic public var status = TorrentStatus.stopped
+    @objc dynamic public var dateDone: Date?
+    @objc dynamic public var errorString: String?
+    @objc dynamic public var activityDate: Date?
+    @objc dynamic public var totalSize: Int = 0
+    @objc dynamic public var downloadedEver: Int = 0
+    @objc dynamic public var secondsDownloading: TimeInterval = 0
+    @objc dynamic public var secondsSeeding: TimeInterval = 0
+    @objc dynamic public var uploadRate: Int = 0
+    @objc dynamic public var downloadRate: Int = 0
+    @objc dynamic public var peersConnected: Int = 0
+    @objc dynamic public var peersSendingToUs: Int = 0
+    @objc dynamic public var peersGettingFromUs: Int = 0
+    @objc dynamic public var uploadedEver: Int = 0
+    @objc dynamic public var uploadRatio: Double = 0.0
+    @objc dynamic public var hashString: String = ""
+    @objc dynamic public var piecesCount: Int = 0
+    @objc dynamic public var pieceSize: Int = 0
+    @objc dynamic public var comment: String = ""
+    @objc dynamic public var downloadDir: String = ""
+    @objc dynamic public var errorNumber: Int = 0
+    @objc dynamic public var creator: String = ""
+    @objc dynamic public var dateCreated: Date?
+    @objc dynamic public var dateAdded: Date?
+    @objc dynamic public var haveValid: Double = 0.0
+    @objc dynamic public var recheckProgress: Double = 0.0
+    @objc dynamic public var bandwidthPriority: Int = 0
+    @objc dynamic public var honorsSessionLimits: Bool = false
+    @objc dynamic public var peerLimit: Int = 0
+    @objc dynamic public var uploadLimited: Bool = false
+    @objc dynamic public var uploadLimit: Int = 0
+    @objc dynamic public var downloadLimited: Bool = false
+    @objc dynamic public var downloadLimit: Int = 0
+    @objc dynamic public var seedIdleMode: Int = 0
+    @objc dynamic public var seedIdleLimit: Int = 0
+    @objc dynamic public var seedRatioMode: Int = 0
+    @objc dynamic public var seedRatioLimit: Double = 0
+    @objc dynamic public var queuePosition: Int = 0
+    @objc dynamic public var eta: Int = 0
+    @objc dynamic public var haveUnchecked: Int = 0
 //    public var piecesBitmap: NSData!
     
     
-    public var isError: Bool {
+    public class func propertyStringName(stringValue value: String) -> String? {
+        return CodingKeys.allCases.first(where: {key in
+            return key.rawValue.camelCased  == value})?.rawValue
+    }
+    
+    
+    
+    @objc dynamic public var isError: Bool {
         return errorString != nil && errorString!.count > 0
     }
     
-    public var isDownloading: Bool {
+    
+    @objc dynamic public var isDownloading: Bool {
         
         return status == .download
     }
     
-    public var isWaiting:Bool {
+    @objc dynamic public var isWaiting: Bool {
         return status == .downloadWait || status == .seedWait
     }
     
-    public var isChecking: Bool {
+    @objc dynamic public var isChecking: Bool {
         return status == .check
     }
     
-    public var isSeeding: Bool {
+    @objc dynamic public var isSeeding: Bool {
         return status == .seed
     }
     
-    public var isStopped: Bool {
+    @objc dynamic public var isStopped: Bool {
         return status == .stopped && percentDone < 1
     }
     
@@ -140,81 +147,98 @@ public typealias trId = Int
         return status == .stopped && percentDone == 1
     }
     
-    public var dateLastActivityString:String {
+    @objc dynamic public var dateLastActivityString:String {
         return activityDate != Date(timeIntervalSince1970: 0) ? formatDate(activityDate)! : ""
     }
     
-    public var dateAddedString:String {
+    @objc dynamic public var dateAddedString:String {
         return dateAdded != Date(timeIntervalSince1970: 0) ? formatDate(dateAdded)! : ""
     }
     
-    public var dateCreatedString:String {
+    @objc dynamic public var dateCreatedString:String {
         return dateCreated != Date(timeIntervalSince1970: 0) ? formatDate(dateCreated)! : ""
     }
     
-    public var dateDoneString: String {
+    @objc dynamic public var dateDoneString: String {
         return dateDone != Date(timeIntervalSince1970: 0) ? formatDate(dateDone)! : ""
     }
     
-    public var downloadedEverString: String {
+    @objc dynamic public var downloadedEverString: String {
         return formatByteCount(downloadedEver)
     }
     
-    public var downloadedSize:Double {
+    @objc dynamic public var downloadedSize:Double {
         return Double(totalSize) * percentDone
     }
     
-    public var downloadedSizeString:String {
+    @objc dynamic public var downloadedSizeString:String {
         return formatByteCount(Int(downloadedSize))
     }
     
-    public var downloadingTimeString:String {
+    @objc dynamic public var downloadingTimeString:String {
         return formatHoursMinutes(secondsDownloading)
     }
     
-    public var etaTimeString:String {
+    @objc dynamic public var etaTimeString:String {
         return formatHoursMinutes(TimeInterval(eta)) == "" ? NSLocalizedString(" ", comment: "ETA time string") : formatHoursMinutes(TimeInterval(eta))
     }
     
-    public var haveUncheckedString:String {
+    @objc dynamic public var haveUncheckedString:String {
         return formatByteCount(haveUnchecked)
     }
     
-    public var haveValidString: String {
+    @objc dynamic public var haveValidString: String {
         return formatByteCount(Int(haveValid))
     }
     
-    public var percentsDoneString:String {
+    @objc dynamic public var percentsDoneString:String {
         if status == .check {
             return String(format: "%.2f%%", recheckProgress * 100)
         }
         return String(format: "%.f%%", percentDone * 100)
     }
     
-    public var percentsDone: Double {
+    class func keyPathsForValuesAffectingPercentsDoneString() -> Set<AnyHashable>? {
+        return Set<AnyHashable>(["percentDone"])
+    }
+    
+    @objc dynamic public var percentsDone: Double {
         if status == .check {
             return recheckProgress
         }
         return percentDone
     }
     
-    public var pieceSizeString:String {
+    class func keyPathsForValuesAffectingPercentsDone() -> Set<AnyHashable>? {
+        return Set<AnyHashable>(["percentDone","status"])
+    }
+    
+    @objc dynamic public var pieceSizeString:String {
         return formatByteCount(pieceSize)
     }
     
-    public var recheckProgressString:String {
+    @objc dynamic public var recheckProgressString:String {
         return String(format: "%03.2f%%", recheckProgress * 100)
     }
     
-    public var seedingTimeString: String {
+    @objc dynamic public var seedingTimeString: String {
         return formatHoursMinutes(TimeInterval(secondsSeeding ))
     }
     
-    public var uploadedEverString: String {
+    @objc dynamic public var uploadedEverString: String {
         return formatByteCount(uploadedEver)
     }
     
-    public var statusString: String {
+    @objc dynamic public var bandwidthPriorityString: String {
+        switch bandwidthPriority {
+            case -1: return "Low"
+            case 0: return "Normal"
+            case 1: return "High"
+            default: return "Unknown"
+        }
+    }
+    
+    @objc dynamic public var statusString: String {
         var statusStr = "Unknown"
         switch self.status {
             case .download:
@@ -232,13 +256,10 @@ public typealias trId = Int
              case .stopped:
                 statusStr = NSLocalizedString("trStopped", comment: "")
         }
-        if isError {
-            statusStr = NSLocalizedString("trError", comment: "")
-        }
         return statusStr
     }
     
-    public var downloadRateString: String {
+    @objc dynamic public var downloadRateString: String {
         var downStr: String! = ""
         if status == .download {
             downStr = NSLocalizedString("↓DL: \(formatByteRate(downloadRate))", comment: "")
@@ -250,7 +271,7 @@ public typealias trId = Int
         return downStr
     }
     
-    public var uploadRateString: String {
+    @objc dynamic public var uploadRateString: String {
         var uplStr: String! = ""
         if status == .download {
             uplStr = NSLocalizedString("↑UL: \(formatByteRate(uploadRate))", comment: "")
@@ -262,7 +283,26 @@ public typealias trId = Int
         return uplStr
     }
     
-    public var totalSizeString: String {
+    @objc dynamic public var speedString: String {
+        if isSeeding {
+            return uploadRateString
+        }
+        else if isFinished || isStopped {
+            return downloadRateString
+        } else {
+            return String(format: "%@ / %@", downloadRateString, uploadRateString)
+        }
+    }
+    
+    @objc dynamic public var ratioString: String {
+        return String(format: "%02.2f", uploadRatio)
+    }
+    
+    @objc dynamic public var sizeString: String {
+        return formatByteCount(totalSize)
+    }
+    
+    @objc dynamic public var totalSizeString: String {
         var sizeStr: String! = ""
         if status == .download {
             sizeStr = String(format: NSLocalizedString("%@ of %@, uploaded %@ (Ratio %0.2f)", comment: ""), downloadedEverString, formatByteCount(totalSize), uploadedEverString, uploadRatio < 0.0 ? 0.0 : uploadRatio)
@@ -281,21 +321,27 @@ public typealias trId = Int
         return sizeStr
     }
     
-    public var jsonObject: JSONObject {
-        var rpcMessage = JSONObject()
-        rpcMessage[JSONKeys.bandwidthPriority] = bandwidthPriority
-        rpcMessage[JSONKeys.downloadLimit] = downloadLimit
-        rpcMessage[JSONKeys.downloadLimited] = downloadLimitEnabled
-        rpcMessage[JSONKeys.honorsSessionLimits] = honorsSessionLimits
-        rpcMessage[JSONKeys.peer_limit] = peerLimit
-        rpcMessage[JSONKeys.queuePosition] = queuePosition
-        rpcMessage[JSONKeys.seedIdleLimit] = seedIdleLimit
-        rpcMessage[JSONKeys.seedIdleMode] = seedIdleMode
-        rpcMessage[JSONKeys.seedRatioLimit] = seedRatioLimit
-        rpcMessage[JSONKeys.seedRatioMode] = seedRatioMode
-        rpcMessage[JSONKeys.uploadLimit] = uploadLimit
-        rpcMessage[JSONKeys.uploadLimited] = uploadLimitEnabled
-        return rpcMessage
+    class func keyPathsForValuesAffectingTotalSizeString() -> Set<AnyHashable>? {
+        return Set<AnyHashable>(["status","downloadedEver","totalSize","uploadedEver","uploadRatio"])
+    }
+    
+    @objc dynamic public var jsonObject: JSONObject {
+        get {
+            var rpcMessage = JSONObject()
+            rpcMessage[JSONKeys.bandwidthPriority] = bandwidthPriority
+            rpcMessage[JSONKeys.downloadLimit] = downloadLimit
+            rpcMessage[JSONKeys.downloadLimited] = downloadLimited
+            rpcMessage[JSONKeys.honorsSessionLimits] = honorsSessionLimits
+            rpcMessage[JSONKeys.peer_limit] = peerLimit
+            rpcMessage[JSONKeys.queuePosition] = queuePosition
+            rpcMessage[JSONKeys.seedIdleLimit] = seedIdleLimit
+            rpcMessage[JSONKeys.seedIdleMode] = seedIdleMode
+            rpcMessage[JSONKeys.seedRatioLimit] = seedRatioLimit
+            rpcMessage[JSONKeys.seedRatioMode] = seedRatioMode
+            rpcMessage[JSONKeys.uploadLimit] = uploadLimit
+            rpcMessage[JSONKeys.uploadLimited] = uploadLimited
+            return rpcMessage
+        }
     }
 
 }
