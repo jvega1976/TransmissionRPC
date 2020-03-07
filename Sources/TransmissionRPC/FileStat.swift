@@ -17,7 +17,7 @@ public struct FileStat: Codable {
     public var priority: Int
 
     public var bytesCompletedString: String {
-        return formatByteCount(bytesCompleted)
+        return ByteCountFormatter.formatByteCount(bytesCompleted)
     }
     
     private enum CodingKeys: String, CodingKey {

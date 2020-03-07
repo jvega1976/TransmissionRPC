@@ -41,54 +41,58 @@ public enum TrackerState: Int, Codable
 }
 
 //MARK: - Tracker struct definition
-open class Tracker: NSObject, Codable {
+open class Tracker: NSObject, Codable, ObservableObject, Identifiable {
 
-    public var announce: String = ""
-    public var announceState: TrackerState.RawValue = TrackerState.inactive.rawValue
-    public var downloadCount:Int = 0
-    public var hasAnnounced: Bool = false
-    public var hasScraped: Bool = false
-    public var host: String = ""
-    public var trackerId: Int = 0
-    public var isBackup: Bool = false
-    public var lastAnnouncePeerCount: Int = 0
-    public var lastAnnounceResult: String = ""
-    public var lastAnnounceStartTime: TimeInterval = 0
-    public var lastAnnounceSucceeded: Bool = false
-    public var lastAnnounceTime: TimeInterval = 0
-    public var lastAnnounceTimedOut: Bool = false
-    public var lastScrapeResult: String = ""
-    public var lastScrapeStartTime: TimeInterval = 0
-    public var lastScrapeSucceeded: Bool = false
-    public var lastScrapeTime: TimeInterval = 0
-    public var lastScrapeTimedOut: TimeInterval = 0
-    public var leecherCount: Int = 0
-    public var nextAnnounceTime: TimeInterval = 0
-    public var nextScrapeTime: TimeInterval = 0
-    public var scrape: String = ""
-    public var scrapeState: Int = 0
-    public var seederCount: Int = 0
-    public var tier: Int = 0
+    @Published public var announce: String = ""
+    @Published public var announceState: Int = TrackerState.inactive.rawValue
+    @Published public var downloadCount:Int = 0
+    @Published public var hasAnnounced: Bool = false
+    @Published public var hasScraped: Bool = false
+    @Published public var host: String = ""
+    @Published public var trackerId: Int = 0
+    @Published public var isBackup: Bool = false
+    @Published public var lastAnnouncePeerCount: Int = 0
+    @Published public var lastAnnounceResult: String = ""
+    @Published public var lastAnnounceStartTime: TimeInterval = 0
+    @Published public var lastAnnounceSucceeded: Bool = false
+    @Published public var lastAnnounceTime: TimeInterval = 0
+    @Published public var lastAnnounceTimedOut: Bool = false
+    @Published public var lastScrapeResult: String = ""
+    @Published public var lastScrapeStartTime: TimeInterval = 0
+    @Published public var lastScrapeSucceeded: Bool = false
+    @Published public var lastScrapeTime: TimeInterval = 0
+    @Published public var lastScrapeTimedOut: TimeInterval = 0
+    @Published public var leecherCount: Int = 0
+    @Published public var nextAnnounceTime: TimeInterval = 0
+    @Published public var nextScrapeTime: TimeInterval = 0
+    @Published public var scrape: String = ""
+    @Published public var scrapeState: Int = 0
+    @Published public var seederCount: Int = 0
+    @Published public var tier: Int = 0
+    
+    public var id: Int {
+        return trackerId
+    }
    
     open var lastAnnounceTimeString: String {
-        return formatDateFrom1970Short(lastAnnounceTime) ?? ""
+        return DateFormatter.formatDateFrom1970Short(lastAnnounceTime)
     }
     open var lastScrapeTimeString: String {
-        return formatDateFrom1970Short(lastScrapeTime) ?? ""
+        return DateFormatter.formatDateFrom1970Short(lastScrapeTime)
     }
     open var nextAnnounceTimeString: String {
-        return formatDateFrom1970Short(nextAnnounceTime) ?? ""
+        return DateFormatter.formatDateFrom1970Short(nextAnnounceTime)
     }
     open var nextScrapeTimeString: String {
-        return formatDateFrom1970Short(nextScrapeTime) ?? ""
+        return DateFormatter.formatDateFrom1970Short(nextScrapeTime)
     }
     
     open var lastAnnounceStartTimeString: String {
-        return formatDateFrom1970Short(lastAnnounceStartTime) ?? ""
+        return DateFormatter.formatDateFrom1970Short(lastAnnounceStartTime)
     }
     
     open var lastScrapeStartTimeString: String {
-        return formatDateFrom1970Short(lastScrapeStartTime) ?? ""
+        return DateFormatter.formatDateFrom1970Short(lastScrapeStartTime)
     }
     
     open var announceString: String {
@@ -124,4 +128,64 @@ open class Tracker: NSObject, Codable {
         case tier
     }
     
+    public required init(from decoder: Decoder) throws {
+        super.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        announce = try values.decode(String.self, forKey: .announce)
+        announceState = try values.decode(Int.self, forKey: .announceState)
+        downloadCount = try values.decode(Int.self, forKey: .downloadCount)
+        hasAnnounced = try values.decode(Bool.self, forKey: .hasAnnounced)
+        hasScraped = try values.decode(Bool.self, forKey: .hasScraped)
+        host = try values.decode(String.self, forKey: .host)
+        trackerId = try values.decode(Int.self, forKey: .trackerId)
+        isBackup = try values.decode(Bool.self, forKey: .isBackup)
+        lastAnnouncePeerCount = try values.decode(Int.self, forKey: .lastAnnouncePeerCount)
+        lastAnnounceResult = try values.decode(String.self, forKey: .lastAnnounceResult)
+        lastAnnounceStartTime = try values.decode(TimeInterval.self, forKey: .lastAnnounceStartTime)
+        lastAnnounceSucceeded = try values.decode(Bool.self, forKey: .lastAnnounceSucceeded)
+        lastAnnounceTime = try values.decode(TimeInterval.self, forKey: .lastAnnounceTime)
+        lastAnnounceTimedOut = try values.decode(Bool.self, forKey: .lastAnnounceTimedOut)
+        lastScrapeResult = try values.decode(String.self, forKey: .lastScrapeResult)
+        lastScrapeStartTime = try values.decode(TimeInterval.self, forKey: .lastScrapeStartTime)
+        lastScrapeSucceeded = try values.decode(Bool.self, forKey: .lastScrapeSucceeded)
+        lastScrapeTime = try values.decode(TimeInterval.self, forKey: .lastScrapeTime)
+        lastScrapeTimedOut = try values.decode(TimeInterval.self, forKey: .lastScrapeTimedOut)
+        leecherCount = try values.decode(Int.self, forKey: .leecherCount)
+        nextAnnounceTime = try values.decode(TimeInterval.self, forKey: .nextAnnounceTime)
+        nextScrapeTime = try values.decode(TimeInterval.self, forKey: .nextScrapeTime)
+        scrape = try values.decode(String.self, forKey: .scrape)
+        scrapeState = try values.decode(Int.self, forKey: .scrapeState)
+        seederCount = try values.decode(Int.self, forKey: .seederCount)
+        tier = try values.decode(Int.self, forKey: .tier)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(announce, forKey: .announce)
+        try container.encode(announceState, forKey: .announceState)
+        try container.encode(downloadCount, forKey: .downloadCount)
+        try container.encode(hasAnnounced, forKey: .hasAnnounced)
+        try container.encode(hasScraped, forKey: .hasScraped)
+        try container.encode(host, forKey: .host)
+        try container.encode(trackerId, forKey: .trackerId)
+        try container.encode(isBackup, forKey: .isBackup)
+        try container.encode(lastAnnouncePeerCount, forKey: .lastAnnouncePeerCount)
+        try container.encode(lastAnnounceResult, forKey: .lastAnnounceResult)
+        try container.encode(lastAnnounceStartTime, forKey: .lastAnnounceStartTime)
+        try container.encode(lastAnnounceSucceeded, forKey: .lastAnnounceSucceeded)
+        try container.encode(lastAnnounceTime, forKey: .lastAnnounceTime)
+        try container.encode(lastAnnounceTimedOut, forKey: .lastAnnounceTimedOut)
+        try container.encode(lastScrapeResult, forKey: .lastScrapeResult)
+        try container.encode(lastScrapeStartTime, forKey: .lastScrapeStartTime)
+        try container.encode(lastScrapeSucceeded, forKey: .lastScrapeSucceeded)
+        try container.encode(lastScrapeTime, forKey: .lastScrapeTime)
+        try container.encode(lastScrapeTimedOut, forKey: .lastScrapeTimedOut)
+        try container.encode(leecherCount, forKey: .leecherCount)
+        try container.encode(nextAnnounceTime, forKey: .nextAnnounceTime)
+        try container.encode(nextScrapeTime, forKey: .nextScrapeTime)
+        try container.encode(scrape, forKey: .scrape)
+        try container.encode(scrapeState, forKey: .scrapeState)
+        try container.encode(seederCount, forKey: .seederCount)
+        try container.encode(tier, forKey: .tier)
+    }
 }

@@ -133,7 +133,7 @@ open class TorrentFile: NSObject {
 
     open var torrentSizeString: String {
         get {
-            return formatByteCount(torrentSize)
+            return ByteCountFormatter.formatByteCount(torrentSize)
         }
     }
 

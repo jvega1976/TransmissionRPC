@@ -15,15 +15,15 @@
 //  using for representation on UITableView
 
 import Foundation
+import Combine
 
 fileprivate let PATH_SPLITTER_STRING = "/"
 let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
 
 //MARK: - FSDirectory structure
 
-@objcMembers open class FSDirectory: NSObject {
-    
-    private var root: FSItem!
+open class FSDirectory: NSObject, ObservableObject, Identifiable {
+
     private var folderItems = [AnyHashable : Any]()
     private var rpcIndexFiles = [Int: FSItem]()
     
@@ -32,23 +32,23 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
     public var count: Int {
         get {
             if _count == -1 {
-                _count = root.filesCount
+                _count = rootItem.filesCount
             }
             return _count
         }
     }
     
+    @Published public var id: Int
     
     /// Get root FSItem
-    @objc dynamic public var rootItem: FSItem? {
-        return root
-    }
+    @Published public private (set) var rootItem: FSItem
     
     /// Initializer
     public override init() {
+        self.rootItem = FSItem(name: "", isFolder: true) // init root element (always folder)
+        self.id = 1
         super.init()
-        self.root = FSItem(name: "", isFolder: true) // init root element (always folder)
-        self.root.indexPath = IndexPath()
+        self.rootItem.indexPath = IndexPath()
         self.folderItems = [:]
     }
     
@@ -58,31 +58,33 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
     /// - parameter fileStats: Array of JSON objects containing file statistics
     /// return: A new FSDirectory object containing all Files for one particular Torrent
     
-    convenience public init(withJSONFileInfo files: [JSONObject], jsonFileStatInfo fileStats:[JSONObject]) {
+    convenience public init(withJSONFileInfo files: [JSONObject], jsonFileStatInfo fileStats:[JSONObject], andId id:Int) {
         self.init()
+        self.id = id
         for i in 0..<files.count {
             var file = files[i]
             let fullName = file[JSONKeys.name] as! String
             let pathComponents = fullName.components(separatedBy: PATH_SPLITTER_STRING)
             file[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
-            root.addPathComponents(withJSONFileInfo: &file, jsonFileStatInfo: fileStats[i], rpcIndex: i)
+            rootItem.addPathComponents(withJSONFileInfo: &file, jsonFileStatInfo: fileStats[i], rpcIndex: i)
         }
         self.sort()
-        rpcIndexFiles = root.rpcFileIndexes
+        rpcIndexFiles = rootItem.rpcFileIndexes
     }
     
     
     /// Sort all folders/files included in directory
     public func sort() {
-        root?.sort()
+        rootItem.sort()
     }
     
     public var sortPredicate: ((FSItem,FSItem)->Bool)? {
         get {
-            return root.sortPredicate
+            return rootItem.sortPredicate
         }
         set {
-            root.sortPredicate = newValue
+            //self.rootItem.objectWillChange.send()
+            rootItem.sortPredicate = newValue
         }
     }
     
@@ -93,10 +95,10 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
     /// return: the file Item positioned at the IndexPath
     public func item(atIndexPath indexPath: IndexPath) -> FSItem? {
         var indexPath = indexPath
-        guard var item = root,
-            !indexPath.isEmpty else { return nil}
+        var item = rootItem
+        guard !indexPath.isEmpty else { return nil}
         while let index = indexPath.popFirst() {
-            item = item.items![index]
+            item = item.items[index]
         }
         return item
     }
@@ -104,7 +106,7 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
     
     public func childIndexes(for item: FSItem) -> [IndexPath] {
         var indexes = [IndexPath]()
-        for childItem in item.items ?? [] {
+        for childItem in item.items  {
             if childItem.isFolder {
                 indexes.append(contentsOf: childIndexes(for: childItem))
             }
@@ -142,36 +144,57 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
     public func updateFSDir(usingStats fileStats:[JSONObject]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
-            rpcIndexFiles[i]?.parent?.willChangeValue(forKey: #keyPath(FSItem.isWanted))
-            rpcIndexFiles[i]?.parent?.willChangeValue(forKey: #keyPath(FSItem.priorityInteger))
-            rpcIndexFiles[i]?.parent?.willChangeValue(forKey: #keyPath(FSItem.bytesCompletedString))
-            rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
-            rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
-            rpcIndexFiles[i]?.priority = FilePriority(rawValue: (file[JSONKeys.priority] as! Int) + 1) ?? .normal
-            rpcIndexFiles[i]?.parent?.didChangeValue(forKey: #keyPath(FSItem.isWanted))
-            rpcIndexFiles[i]?.parent?.didChangeValue(forKey: #keyPath(FSItem.priorityInteger))
-            rpcIndexFiles[i]?.parent?.didChangeValue(forKey: #keyPath(FSItem.bytesCompletedString))
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.isWanted)
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.priorityInteger)
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
+                //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
+                self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
+                self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
+                self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
+            //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.isWanted)
+            //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.priorityInteger)
+            //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.bytesCompletedString)
         }
     }
     
     public func updateFSDir(usingStats fileStats:[FileStat]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
-            rpcIndexFiles[i]?.parent?.willChangeValue(forKey: #keyPath(FSItem.isWanted))
-            rpcIndexFiles[i]?.parent?.willChangeValue(forKey: #keyPath(FSItem.priorityInteger))
-            rpcIndexFiles[i]?.parent?.willChangeValue(forKey: #keyPath(FSItem.bytesCompletedString))
-            rpcIndexFiles[i]?.bytesCompleted = file.bytesCompleted
-            rpcIndexFiles[i]?.isWanted = file.wanted
-            rpcIndexFiles[i]?.priority = FilePriority(rawValue: file.priority + 1) ?? .normal
-            rpcIndexFiles[i]?.parent?.didChangeValue(forKey: #keyPath(FSItem.isWanted))
-            rpcIndexFiles[i]?.parent?.didChangeValue(forKey: #keyPath(FSItem.priorityInteger))
-            rpcIndexFiles[i]?.parent?.didChangeValue(forKey: #keyPath(FSItem.bytesCompletedString))
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent.isWanted)
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent.priorityInteger)
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent.bytesCompletedString)
+                //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
+                self.rpcIndexFiles[i]?.bytesCompleted = file.bytesCompleted
+                self.rpcIndexFiles[i]?.isWanted = file.wanted
+                self.rpcIndexFiles[i]?.priorityInteger = file.priority
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.isWanted)
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.priorityInteger)
+            //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
+        }
+    }
+    
+    public func updateFSDir(with fsDir: FSDirectory) {
+        if fsDir.id == self.id {
+            self.rootItem.items = fsDir.rootItem.items
         }
     }
     
     
     public override var description: String {
-        return root!.description
+        return rootItem.description
+    }
+    
+    public static func == (lhs: FSDirectory, rhs: FSDirectory) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    public static func != (lhs: FSDirectory, rhs: FSDirectory) -> Bool {
+        return lhs.id != rhs.id
+    }
+    
+    override public func isEqual(_ object: Any?) -> Bool {
+        guard let fsDir = object as? FSDirectory else { return false}
+        return fsDir.id == self.id
     }
 }
 
@@ -191,7 +214,7 @@ extension FSDirectory {
     /// add new item to directory with separated file path
     public func addPathComonents(_ pathComponents: [String], andRpcIndex rpcIndex: Int) -> FSItem {
         // add all components to the tree (from root)
-        var levelItem = root
+        var levelItem = rootItem
         
         let c = pathComponents.count
         
@@ -207,25 +230,26 @@ extension FSDirectory {
             cPath += "/"
             
             if isFolder  && folderItems[cPath] != nil {
-                levelItem = folderItems[cPath] as? FSItem
+                levelItem = folderItems[cPath] as! FSItem
                 continue
             }
             
-            levelItem = levelItem!.add(withName: itemName, isFolder: isFolder)
+            levelItem = levelItem.add(withName: itemName, isFolder: isFolder)
             
             // cache folder item
             if isFolder {
                 folderItems[cPath] = levelItem
-                levelItem!.fullName = (cPath as NSString).substring(to: cPath.count - 1)
+                levelItem.fullName = (cPath as NSString).substring(to: cPath.count - 1)
                 
                 //os_log(@"%@", levelItem.fullName);
             } else {
-                levelItem!.rpcIndex = rpcIndex
+                levelItem.rpcIndex = rpcIndex
             }
         }
-        rpcIndexFiles = root.rpcFileIndexes
-        return levelItem!
+        rpcIndexFiles = rootItem.rpcFileIndexes
+        return levelItem
     }
+    
     
     
 }

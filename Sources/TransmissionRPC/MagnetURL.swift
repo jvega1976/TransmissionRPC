@@ -20,7 +20,8 @@ private let kMagnetParamPrefixTorrentHashUrn = "xt="
 private let kMagnetParamPrefixTorrentHashParamSeparator = ":"
 private let kMagnetComponentSeparator = "="
 
-public struct MagnetURL {
+
+open class MagnetURL: NSObject {
     
     private var str = ""
     private var _hash = ""
@@ -58,7 +59,7 @@ public struct MagnetURL {
         var sz = NSLocalizedString("MagnetTorrentSizeUnknown", comment: "")
 
         if Int(size) != TRSIZE_NOT_DEFINED {
-            sz = formatByteCount(size)
+            sz = ByteCountFormatter.formatByteCount(size)
         }
 
         return sz
@@ -100,7 +101,7 @@ public struct MagnetURL {
     }
 
     // parse magnet
-    public mutating func parseMagnetString() {
+    public func parseMagnetString() {
         size = Int(TRSIZE_NOT_DEFINED)
 
         var comps = str.components(separatedBy: kMagnetContentSeparator)
@@ -124,7 +125,7 @@ public struct MagnetURL {
         }
     }
 
-    public mutating func parseString(_ s: String) {
+    public func parseString(_ s: String) {
         if s.hasPrefix(kMagnetParamPrefixTorrentSize) {
             size = getLongFromComponent(s)
         } else if s.hasPrefix(kMagnetParamPrefixTorrentSizeString) {
@@ -141,6 +142,7 @@ public struct MagnetURL {
     }
 
     public init(url: URL) {
+        super.init()
         self._trackers = []
         self.str = url.description
         parseMagnetString()

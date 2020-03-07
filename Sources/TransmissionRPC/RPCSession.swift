@@ -10,6 +10,7 @@
 
 import Foundation
 import os
+import Combine
 
 let HTTP_RESPONSE_OK = 200
 let HTTP_RESPONSE_UNAUTHORIZED = 401
@@ -26,7 +27,7 @@ enum RPCSessionError: Error  {
 
 // MARK: - RPCSession.
 ///The RPCSession provide the main APIs to send requests to the Transmission RPC server.
-open class RPCSession: NSObject {
+open class RPCSession: NSObject, ObservableObject {
     
     ///Common Standard Share Session (singleton)
     ///return a common `RPCSession` available for use through multiple interface components

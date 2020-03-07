@@ -21,6 +21,25 @@ public typealias JSONObject = [JSONKey: Any]
     case download = 4 /* Downloading */
     case seedWait = 5 /* Queued to seed */
     case seed = 6 /* Seeding */
+    
+    public var statusString: String {
+        switch self {
+            case .download:
+                return NSLocalizedString("trDownloading", comment: "")
+            case .downloadWait:
+                return NSLocalizedString("trWaiting", comment: "")
+            case .check:
+                return NSLocalizedString("trWaitingCheck", comment: "")
+            case .checkWait:
+                return NSLocalizedString("trWaitingCheck", comment: "")
+            case .seedWait:
+                return NSLocalizedString("trWaitingSeed", comment: "")
+            case .seed:
+                return NSLocalizedString("trSeeding", comment: "")
+            case .stopped:
+                return NSLocalizedString("trStopped", comment: "")
+        }
+    }
 }
 
 // MARK: - RPC JSON Message Keys

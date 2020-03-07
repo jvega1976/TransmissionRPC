@@ -233,7 +233,7 @@ public extension RPCSession {
                 let files = torrentsFiles.first![JSONKeys.files] as? [JSONObject] ?? []
                 let fileStats = torrentsFiles.first![JSONKeys.fileStats] as? [JSONObject] ?? []
                 
-                let fsDir = FSDirectory(withJSONFileInfo: files, jsonFileStatInfo: fileStats)
+                let fsDir = FSDirectory(withJSONFileInfo: files, jsonFileStatInfo: fileStats, andId: trId)
                 
                 completion(fsDir,nil)
             })

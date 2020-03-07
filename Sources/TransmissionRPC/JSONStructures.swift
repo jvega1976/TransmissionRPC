@@ -81,7 +81,7 @@ public struct JSONTorrentAdded: Codable {
  @struct JSONPeersObject
  Structures to parse the torrent-get RPC JSON response with the peers and peersFrom object fields.
  */
-public struct JSONPeersObject: Codable {
+public struct JSONPeersObject: Decodable {
     public var peers: [Peer]
     public var peersFrom: PeerStat
     
@@ -91,7 +91,7 @@ public struct JSONPeersObject: Codable {
     }
 }
 
-public struct JSONPeersArguments: Codable {
+public struct JSONPeersArguments: Decodable {
     
     public var torrents: [JSONPeersObject]
     
@@ -100,7 +100,7 @@ public struct JSONPeersArguments: Codable {
     }
 }
 
-public struct JSONPeers: Codable {
+public struct JSONPeers: Decodable {
     public var arguments: JSONPeersArguments
     public var result: String
     

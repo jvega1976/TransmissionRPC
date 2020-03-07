@@ -7,25 +7,26 @@
 //
 
 import Foundation
+import Combine
 
 //MARK: - SessionStats struct definition
-open class SessionStats: NSObject, Decodable {
+open class SessionStats: NSObject, Decodable, ObservableObject {
     
-    public var activeTorrentCount = 0
-    public var downloadSpeed = 0
-    public var pausedTorrentCount = 0
-    public var torrentCount = 0
-    public var uploadSpeed = 0
-    public var cumulativeUploadedBytes = 0
-    public var cumulativedownloadedBytes = 0
-    public var cumulativeFilesAdded = 0
-    public var cumulativesessionCount = 0
-    public var cumulativeSecondsActive: TimeInterval = 0
-    public var currentUploadedBytes = 0
-    public var currentdownloadedBytes = 0
-    public var currentFilesAdded = 0
-    public var currentsessionCount = 0
-    public var currentSecondsActive: TimeInterval = 0
+    @Published public var activeTorrentCount = 0
+    @Published public var downloadSpeed = 0
+    @Published public var pausedTorrentCount = 0
+    @Published public var torrentCount = 0
+    @Published public var uploadSpeed = 0
+    @Published public var cumulativeUploadedBytes = 0
+    @Published public var cumulativedownloadedBytes = 0
+    @Published public var cumulativeFilesAdded = 0
+    @Published public var cumulativesessionCount = 0
+    @Published public var cumulativeSecondsActive: TimeInterval = 0
+    @Published public var currentUploadedBytes = 0
+    @Published public var currentdownloadedBytes = 0
+    @Published public var currentFilesAdded = 0
+    @Published public var currentsessionCount = 0
+    @Published public var currentSecondsActive: TimeInterval = 0
 
     private enum CodingKeys: String, CodingKey {
         case activeTorrentCount = "activeTorrentCount"
@@ -74,6 +75,28 @@ open class SessionStats: NSObject, Decodable {
         currentFilesAdded = try currentStats.decode(Int.self, forKey: .currentFilesAdded)
         currentsessionCount = try currentStats.decode(Int.self, forKey: .currentsessionCount)
         currentSecondsActive = try currentStats.decode(TimeInterval.self, forKey: .currentSecondsActive)
+    }
+    
+    public override init() {
+        super.init()
+    }
+    
+    public func update(with stats: SessionStats) {
+        self.activeTorrentCount = stats.activeTorrentCount
+        self.downloadSpeed = stats.downloadSpeed
+        self.pausedTorrentCount = stats.pausedTorrentCount
+        self.torrentCount = stats.torrentCount
+        self.uploadSpeed = stats.uploadSpeed
+        self.cumulativeUploadedBytes = stats.cumulativeUploadedBytes
+        self.cumulativedownloadedBytes = stats.cumulativedownloadedBytes
+        self.cumulativeFilesAdded = stats.cumulativeFilesAdded
+        self.cumulativesessionCount = stats.cumulativesessionCount
+        self.cumulativeSecondsActive = stats.cumulativeSecondsActive
+        self.currentUploadedBytes = stats.currentUploadedBytes
+        self.currentdownloadedBytes = stats.currentdownloadedBytes
+        self.currentFilesAdded = stats.currentFilesAdded
+        self.currentsessionCount = stats.currentsessionCount
+        self.currentSecondsActive = stats.currentSecondsActive
     }
 }
 

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 public struct PeerStat: Codable {
     
@@ -28,37 +29,50 @@ public struct PeerStat: Codable {
         case fromTracker
     }
    
+    public init() {
+        
+    }
 }
 
-open class Peer: NSObject, Codable {
+open class Peer: NSObject, Codable, ObservableObject, Identifiable {
     
-    public var ipAddress: String = ""
-    public var clientName: String = ""
-    public var clientIsChoked: Bool = false
-    public var clientIsInterested: Bool = false
-    public var flagString: String = ""
-    public var isDownloadingFrom: Bool = false
-    public var isEncrypted: Bool = false
-    public var isIncoming: Bool = false
-    public var isUploadingTo: Bool = false
-    public var isUTP: Bool = false
-    public var peerIsChoked: Bool = false
-    public var peerIsInterested: Bool = false
-    public var port: Int = 0
-    public var progress: Double = 0.0
-    public var rateToClient: Int = 0
-    public var rateToPeer: Int = 0
-    
-    public var progressString:String {
-        return String(format: "%02.2f%%", progress * 100.0)
+    @Published public var ipAddress: String = ""
+    @Published public var clientName: String = ""
+    @Published public var clientIsChoked: Bool = false
+    @Published public var clientIsInterested: Bool = false
+    @Published public var flagString: String = ""
+    @Published public var isDownloadingFrom: Bool = false
+    @Published public var isEncrypted: Bool = false
+    @Published public var isIncoming: Bool = false
+    @Published public var isUploadingTo: Bool = false
+    @Published public var isUTP: Bool = false
+    @Published public var peerIsChoked: Bool = false
+    @Published public var peerIsInterested: Bool = false
+    @Published public var port: Int = 0
+    @Published public var progress: Double = 0.0 {
+        didSet {
+            self.progressString = String(format: "%02.2f%%", progress * 100.0)
+        }
     }
+    @Published public var rateToClient: Int = 0 {
+        didSet {
+            rateToClientString = ByteCountFormatter.formatByteRate(rateToClient)
+        }
+    }
+    @Published public var rateToPeer: Int = 0 {
+        didSet {
+            rateToPeerString = ByteCountFormatter.formatByteRate(rateToPeer)
+        }
+    }
+    
+    @Published public var progressString: String = ""
    
-    public var rateToClientString: String {
-        return formatByteRate(rateToClient)
-    }
+    @Published public var rateToClientString: String = ""
 
-    public var rateToPeerString: String {
-        return formatByteRate(rateToPeer)
+    @Published public var rateToPeerString: String = ""
+    
+    public var id: String {
+        return ipAddress
     }
     
     private enum CodingKeys: String, CodingKey {
@@ -80,4 +94,46 @@ open class Peer: NSObject, Codable {
         case rateToPeer
     }
     
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.ipAddress, forKey: .ipAddress)
+        try container.encode(self.clientName, forKey: .clientName)
+        try container.encode(self.clientIsInterested, forKey: .clientIsInterested)
+        try container.encode(self.clientIsChoked, forKey: .clientIsChoked)
+        try container.encode(self.flagString, forKey: .flagString)
+        try container.encode(self.isDownloadingFrom, forKey: .isDownloadingFrom)
+        try container.encode(self.isEncrypted, forKey: .isEncrypted)
+        try container.encode(self.isIncoming, forKey: .isIncoming)
+        try container.encode(self.isUploadingTo, forKey: .isUploadingTo)
+        try container.encode(self.isUTP, forKey: .isUTP)
+        try container.encode(self.peerIsChoked, forKey: .peerIsChoked)
+        try container.encode(self.peerIsInterested, forKey: .peerIsInterested)
+        try container.encode(self.port, forKey: .port)
+        try container.encode(self.progress, forKey: .progress)
+        try container.encode(self.rateToClient, forKey: .rateToClient)
+        try container.encode(self.rateToPeer, forKey: .rateToPeer)
+        
+    }
+    
+    public required init(from decoder: Decoder) throws {
+        super.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        self.ipAddress = try values.decode(String.self, forKey: .ipAddress)
+        self.clientName = try values.decode(String.self, forKey: .clientName)
+        self.clientIsInterested = try values.decode(Bool.self, forKey: .clientIsInterested)
+        self.clientIsChoked = try values.decode(Bool.self, forKey: .clientIsChoked)
+        self.flagString = try values.decode(String.self, forKey: .flagString)
+        self.isDownloadingFrom = try values.decode(Bool.self, forKey: .isDownloadingFrom)
+        self.isEncrypted = try values.decode(Bool.self, forKey: .isEncrypted)
+        self.isIncoming = try values.decode(Bool.self, forKey: .isIncoming)
+        self.isUploadingTo = try values.decode(Bool.self, forKey: .isUploadingTo)
+        self.isUTP = try values.decode(Bool.self, forKey: .isUTP)
+        self.peerIsChoked = try values.decode(Bool.self, forKey: .peerIsChoked)
+        self.peerIsInterested = try values.decode(Bool.self, forKey: .peerIsInterested)
+        self.port = try values.decode(Int.self, forKey: .port)
+        self.progress = try values.decode(Double.self, forKey: .progress)
+        self.rateToClient = try values.decode(Int.self, forKey: .rateToClient)
+        self.rateToPeer = try values.decode(Int.self, forKey: .rateToPeer)        
+    }
+      
 }
