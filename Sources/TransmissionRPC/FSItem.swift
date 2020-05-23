@@ -112,7 +112,9 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
         didSet {
             if let parent = self.parent {
                 //return !items!.contains(where: { !$0.isWanted })
-                parent.isWanted = parent.isWanted && self.isWanted
+                parent.isWanted = parent.items.reduce(true, { isWanted, item in
+                    return isWanted && item.isWanted
+                })
             }
         }
     }

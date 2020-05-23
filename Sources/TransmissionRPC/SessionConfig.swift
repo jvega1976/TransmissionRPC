@@ -148,8 +148,8 @@ open class SessionConfig: NSObject, Codable, ObservableObject {
     @Published public var altSpeedDown: Int = 0
     @Published public var altSpeedUp: Int = 0
     @Published public var altSpeedTimeEnabled: Bool = false
-    @Published public var altSpeedTimeBegin: Int = 0
-    @Published public var altSpeedTimeEnd: Int = 0
+    @Published public var altSpeedTimeBegin: TimeInterval = 0
+    @Published public var altSpeedTimeEnd: TimeInterval = 0
     @Published public var altSpeedTimeDay: Int = 0
     @Published public var cacheSizeMb: Int = 0
     @Published public var configDir: String = ""
@@ -178,6 +178,8 @@ open class SessionConfig: NSObject, Codable, ObservableObject {
         super.init()
     }
     
+    @Published public var altSpeedTimeBeginDate: Date = Date()
+    @Published public var altSpeedTimeEndDate: Date = Date()
     
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
@@ -274,13 +276,16 @@ open class SessionConfig: NSObject, Codable, ObservableObject {
         self.altSpeedDown = try values.decode(Int.self, forKey: .altSpeedDown)
         self.altSpeedUp = try values.decode(Int.self, forKey: .altSpeedUp)
         self.altSpeedTimeEnabled = try values.decode(Bool.self, forKey: .altSpeedTimeEnabled)
-        self.altSpeedTimeBegin = try values.decode(Int.self, forKey: .altSpeedTimeBegin)
-        self.altSpeedTimeEnd = try values.decode(Int.self, forKey: .altSpeedTimeEnd)
+        self.altSpeedTimeBegin = try values.decode(TimeInterval.self, forKey: .altSpeedTimeBegin)
+        self.altSpeedTimeEnd = try values.decode(TimeInterval.self, forKey: .altSpeedTimeEnd)
         self.altSpeedTimeDay = try values.decode(Int.self, forKey: .altSpeedTimeDay)
         self.cacheSizeMb = try values.decode(Int.self, forKey: .cacheSizeMb)
         self.configDir = try values.decode(String.self, forKey: .configDir)
         self.rpcVersionMinimum = try values.decode(Int.self, forKey: .rpcVersionMinimum)
         self.blocklistSize = try values.decode(Int.self, forKey: .blocklistSize)
+        
+        self.altSpeedTimeBeginDate = Date(timeIntervalSince1970: self.altSpeedTimeBegin)
+        self.altSpeedTimeEndDate = Date(timeIntervalSince1970: self.altSpeedTimeEnd)
     }
     
     public class func propertyStringName(stringValue string: String) -> String? {
