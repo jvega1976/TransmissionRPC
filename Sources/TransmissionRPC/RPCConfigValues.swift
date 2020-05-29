@@ -21,6 +21,7 @@ public typealias JSONObject = [JSONKey: Any]
     case download = 4 /* Downloading */
     case seedWait = 5 /* Queued to seed */
     case seed = 6 /* Seeding */
+    case unknown = 7
     
     public var statusString: String {
         switch self {
@@ -38,6 +39,8 @@ public typealias JSONObject = [JSONKey: Any]
                 return NSLocalizedString("trSeeding", comment: "")
             case .stopped:
                 return NSLocalizedString("trStopped", comment: "")
+            case .unknown:
+                return NSLocalizedString("unknown", comment: "")
         }
     }
 }
@@ -47,6 +50,7 @@ public struct JSONKeys: Codable, Hashable {
     public static let delete_local_data: JSONKey = "delete-local-data"
     public static let fields: JSONKey = "fields"
     public static let activityDate: JSONKey = "activityDate"
+    public static let editDate: JSONKey = "editDate"
     public static let addedDate: JSONKey = "addedDate"
     public static let bandwidthPriority: JSONKey = "bandwidthPriority"
     public static let comment: JSONKey = "comment"

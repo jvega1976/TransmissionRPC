@@ -101,11 +101,11 @@ public extension ByteCountFormatter {
 
 public extension DateFormatter {
     
-    private class func formatDateFormatter(withStyle style:DateFormatter.Style) -> DateFormatter {
+    private class func formatDateFormatter(withStyle style: DateFormatter.Style) -> DateFormatter {
         let locale = NSLocale.current as NSLocale
         let myFormatDateFormatter = DateFormatter()
         myFormatDateFormatter.locale = locale as Locale
-        myFormatDateFormatter.timeStyle = .short
+        myFormatDateFormatter.timeStyle = .medium
         myFormatDateFormatter.dateStyle = style
         return myFormatDateFormatter
     }

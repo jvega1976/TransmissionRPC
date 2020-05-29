@@ -23,6 +23,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
 
      private enum CodingKeys: String, CodingKey, CaseIterable {
         case activityDate = "activityDate"
+        case editDate = "editDate"
+        case startDate = "startDate"
         case bandwidthPriority = "bandwidthPriority"
         case comment = "comment"
         case creator = "creator"
@@ -74,6 +76,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var dateDone: Date?
     @Published public var errorString: String = ""
     @Published public var activityDate: Date?
+    @Published public var editDate: Date?
+    @Published public var startDate: Date?
     @Published public var totalSize: Int = 0
     @Published public var downloadedEver: Int = 0
     @Published public var secondsDownloading: TimeInterval = 0
@@ -93,7 +97,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var errorNumber: Int = 0
     @Published public var creator: String = ""
     @Published public var dateCreated: Date?
-    @Published public var dateAdded: Date?
+    @Published public var dateAdded: Date!
     @Published public var haveValid: Double = 0.0
     @Published public var recheckProgress: Double = 0.0
     @Published public var bandwidthPriority: Int = 0
@@ -131,53 +135,55 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public private (set) var detailStatus: String = ""
     @Published public private (set) var peersDetail: String = ""
     @Published public private (set) var statusString: String = ""
-    
+
     public required init(from decoder: Decoder) throws {
         super.init()
         let values = try decoder.container(keyedBy: CodingKeys.self)
         trId = try values.decode(Int.self, forKey: .trId)
-        status = try values.decode(TorrentStatus.self, forKey: .status)
-        percentDone = try values.decode(Double.self, forKey: .percentDone)
-        name = try values.decode(String.self, forKey: .name)
-        dateDone = try values.decode(Date.self, forKey: .dateDone)
-        errorString = try values.decode(String.self, forKey: .errorString)
-        activityDate = try values.decode(Date.self, forKey: .activityDate)
-        totalSize = try values.decode(Int.self, forKey: .totalSize)
-        downloadedEver = try values.decode(Int.self, forKey: .downloadedEver)
-        secondsDownloading = try values.decode(TimeInterval.self, forKey: .secondsDownloading)
-        secondsSeeding = try values.decode(TimeInterval.self, forKey: .secondsSeeding)
-        uploadRate = try values.decode(Int.self, forKey: .uploadRate)
-        downloadRate = try values.decode(Int.self, forKey: .downloadRate)
-        peersConnected = try values.decode(Int.self, forKey: .peersConnected)
-        peersSendingToUs = try values.decode(Int.self, forKey: .peersSendingToUs)
-        peersGettingFromUs = try values.decode(Int.self, forKey: .peersGettingFromUs)
-        uploadedEver = try values.decode(Int.self, forKey: .uploadedEver)
-        uploadRatio = try values.decode(Double.self, forKey: .uploadRatio)
-        hashString = try values.decode(String.self, forKey: .hashString)
-        piecesCount = try values.decode(Int.self, forKey: .piecesCount)
-        pieceSize = try values.decode(Int.self, forKey: .pieceSize)
-        comment = try values.decode(String.self, forKey: .comment)
-        downloadDir = try values.decode(String.self, forKey: .downloadDir)
-        errorNumber = try values.decode(Int.self, forKey: .errorNumber)
-        creator = try values.decode(String.self, forKey: .creator)
-        dateCreated = try values.decode(Date?.self, forKey: .dateCreated)
-        dateAdded = try values.decode(Date?.self, forKey: .dateAdded)
-        haveValid = try values.decode(Double.self, forKey: .haveValid)
-        recheckProgress = try values.decode(Double.self, forKey: .recheckProgress)
-        bandwidthPriority = try values.decode(Int.self, forKey: .bandwidthPriority)
-        honorsSessionLimits = try values.decode(Bool.self, forKey: .honorsSessionLimits)
-        peerLimit = try values.decode(Int.self, forKey: .peerLimit)
-        uploadLimited = try values.decode(Bool.self, forKey: .uploadLimited)
-        uploadLimit = try values.decode(Int.self, forKey: .uploadLimit)
-        downloadLimited = try values.decode(Bool.self, forKey: .downloadLimited)
-        downloadLimit = try values.decode(Int.self, forKey: .downloadLimit)
-        seedIdleMode = try values.decode(Int.self, forKey: .seedIdleMode)
-        seedIdleLimit = try values.decode(Int.self, forKey: .seedIdleLimit)
-        seedRatioMode = try values.decode(Int.self, forKey: .seedRatioMode)
-        seedRatioLimit = try values.decode(Double.self, forKey: .seedRatioLimit)
-        queuePosition = try values.decode(Int.self, forKey: .queuePosition)
-        eta = try values.decode(Int.self, forKey: .eta)
-        haveUnchecked = try values.decode(Int.self, forKey: .haveUnchecked)
+        status = (try? values.decode(TorrentStatus.self, forKey: .status)) ?? .unknown
+        percentDone = (try? values.decode(Double.self, forKey: .percentDone)) ?? 0.0
+        name = (try? values.decode(String.self, forKey: .name)) ?? ""
+        dateDone = try? values.decode(Date.self, forKey: .dateDone)
+        errorString = (try? values.decode(String.self, forKey: .errorString)) ?? ""
+        activityDate = try? values.decode(Date.self, forKey: .activityDate)
+        editDate = try? values.decode(Date.self, forKey: .editDate)
+        startDate = try? values.decode(Date.self, forKey: .startDate)
+        totalSize = (try? values.decode(Int.self, forKey: .totalSize)) ?? 0
+        downloadedEver = (try? values.decode(Int.self, forKey: .downloadedEver)) ?? 0
+        secondsDownloading = (try? values.decode(TimeInterval.self, forKey: .secondsDownloading)) ?? 0
+        secondsSeeding = (try? values.decode(TimeInterval.self, forKey: .secondsSeeding)) ?? 0
+        uploadRate = (try? values.decode(Int.self, forKey: .uploadRate)) ?? 0
+        downloadRate = (try? values.decode(Int.self, forKey: .downloadRate)) ?? 0
+        peersConnected = (try? values.decode(Int.self, forKey: .peersConnected)) ?? 0
+        peersSendingToUs = (try? values.decode(Int.self, forKey: .peersSendingToUs)) ?? 0
+        peersGettingFromUs = (try? values.decode(Int.self, forKey: .peersGettingFromUs)) ?? 0
+        uploadedEver = (try? values.decode(Int.self, forKey: .uploadedEver)) ?? 0
+        uploadRatio = (try? values.decode(Double.self, forKey: .uploadRatio)) ?? 0.0
+        hashString = (try? values.decode(String.self, forKey: .hashString)) ?? ""
+        piecesCount = (try? values.decode(Int.self, forKey: .piecesCount)) ?? 0
+        pieceSize = (try? values.decode(Int.self, forKey: .pieceSize)) ?? 0
+        comment = (try? values.decode(String.self, forKey: .comment)) ?? ""
+        downloadDir = (try? values.decode(String.self, forKey: .downloadDir)) ?? ""
+        errorNumber = (try? values.decode(Int.self, forKey: .errorNumber)) ?? 0
+        creator = (try? values.decode(String.self, forKey: .creator)) ?? ""
+        dateCreated = try? values.decode(Date?.self, forKey: .dateCreated)
+        dateAdded = (try? values.decode(Date?.self, forKey: .dateAdded)) ?? Date(timeIntervalSince1970: 0)
+        haveValid = (try? values.decode(Double.self, forKey: .haveValid)) ?? 0
+        recheckProgress = (try? values.decode(Double.self, forKey: .recheckProgress)) ?? 0
+        bandwidthPriority = (try? values.decode(Int.self, forKey: .bandwidthPriority)) ?? 0
+        honorsSessionLimits = (try? values.decode(Bool.self, forKey: .honorsSessionLimits)) ?? false
+        peerLimit = (try? values.decode(Int.self, forKey: .peerLimit)) ?? 0
+        uploadLimited = (try? values.decode(Bool.self, forKey: .uploadLimited)) ?? false
+        uploadLimit = (try? values.decode(Int.self, forKey: .uploadLimit)) ?? 0
+        downloadLimited = (try? values.decode(Bool.self, forKey: .downloadLimited)) ?? false
+        downloadLimit = (try? values.decode(Int.self, forKey: .downloadLimit)) ?? 0
+        seedIdleMode = (try? values.decode(Int.self, forKey: .seedIdleMode)) ?? 0
+        seedIdleLimit = (try? values.decode(Int.self, forKey: .seedIdleLimit)) ?? 0
+        seedRatioMode = (try? values.decode(Int.self, forKey: .seedRatioMode)) ?? 0
+        seedRatioLimit = (try? values.decode(Double.self, forKey: .seedRatioLimit)) ?? 0.0
+        queuePosition = (try? values.decode(Int.self, forKey: .queuePosition)) ?? 0
+        eta = (try? values.decode(Int.self, forKey: .eta)) ?? 0
+        haveUnchecked = (try? values.decode(Int.self, forKey: .haveUnchecked)) ?? 0
 
         CommonInit()
     
@@ -191,6 +197,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         try container.encode(dateDone, forKey: .dateDone)
         try container.encode(errorString, forKey: .errorString)
         try container.encode(activityDate, forKey: .activityDate)
+        try container.encode(editDate, forKey: .editDate)
+        try container.encode(startDate, forKey: .startDate)
         try container.encode(totalSize, forKey: .totalSize)
         try container.encode(downloadedEver, forKey: .downloadedEver)
         try container.encode(secondsDownloading, forKey: .secondsDownloading)
@@ -332,7 +340,54 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         self.statusString = self.status.statusString
     }
     
-
+    open func update(with torrent: Torrent) {
+        self.trId = torrent.trId
+        self.name = torrent.name
+        self.status = torrent.status
+        self.percentDone = torrent.percentDone
+        self.errorString = torrent.errorString
+        self.activityDate = torrent.activityDate
+        self.editDate = torrent.editDate
+        self.startDate = torrent.startDate
+        self.dateDone = torrent.dateDone
+        self.totalSize = torrent.totalSize
+        self.downloadedEver = torrent.downloadedEver
+        self.secondsDownloading = torrent.secondsDownloading
+        self.secondsSeeding = torrent.secondsSeeding
+        self.uploadRate = torrent.uploadRate
+        self.downloadRate = torrent.downloadRate
+        self.peersConnected = torrent.peersConnected
+        self.peersSendingToUs = torrent.peersSendingToUs
+        self.peersGettingFromUs = torrent.peersGettingFromUs
+        self.uploadedEver = torrent.uploadedEver
+        self.uploadRatio = torrent.uploadRatio
+        self.hashString = torrent.hashString
+        self.piecesCount = torrent.piecesCount
+        self.pieceSize = torrent.pieceSize
+        self.comment = torrent.comment
+        self.downloadDir = torrent.downloadDir
+        self.errorNumber = torrent.errorNumber
+        self.creator = torrent.creator
+        self.dateCreated = torrent.dateCreated
+        self.dateAdded = torrent.dateAdded
+        self.haveValid = torrent.haveValid
+        self.recheckProgress = torrent.recheckProgress
+        self.bandwidthPriority = torrent.bandwidthPriority
+        self.honorsSessionLimits = torrent.honorsSessionLimits
+        self.peerLimit = torrent.peerLimit
+        self.uploadLimited = torrent.uploadLimited
+        self.uploadLimit = torrent.uploadLimit
+        self.downloadLimited = torrent.downloadLimited
+        self.downloadLimit = torrent.downloadLimit
+        self.seedIdleMode = torrent.seedIdleMode
+        self.seedIdleLimit = torrent.seedIdleLimit
+        self.seedRatioMode = torrent.seedRatioMode
+        self.seedRatioLimit = torrent.seedRatioLimit
+        self.queuePosition = torrent.queuePosition
+        self.eta = torrent.eta
+        self.haveUnchecked = torrent.haveUnchecked
+        self.CommonInit()
+    }
     
     public class func propertyStringName(stringValue value: String) -> String? {
         return CodingKeys.allCases.first(where: {key in

@@ -13,52 +13,7 @@ import XCTest
 @testable import TransmissionRPC
 
 extension Torrent: CategoryItem {
-    public func update(with torrent: Torrent) {
-        self.trId = torrent.trId
-        self.name = torrent.name
-        self.status = torrent.status
-        self.percentDone = torrent.percentDone
-        self.dateDone = torrent.dateDone
-        self.errorString = torrent.errorString
-        self.activityDate = torrent.activityDate
-        self.totalSize = torrent.totalSize
-        self.downloadedEver = torrent.downloadedEver
-        self.secondsDownloading = torrent.secondsDownloading
-        self.secondsSeeding = torrent.secondsSeeding
-        self.uploadRate = torrent.uploadRate
-        self.downloadRate = torrent.downloadRate
-        self.peersConnected = torrent.peersConnected
-        self.peersSendingToUs = torrent.peersSendingToUs
-        self.peersGettingFromUs = torrent.peersGettingFromUs
-        self.uploadedEver = torrent.uploadedEver
-        self.uploadRatio = torrent.uploadRatio
-        self.hashString = torrent.hashString
-        self.piecesCount = torrent.piecesCount
-        self.pieceSize = torrent.pieceSize
-        self.comment = torrent.comment
-        self.downloadDir = torrent.downloadDir
-        self.errorNumber = torrent.errorNumber
-        self.creator = torrent.creator
-        self.dateCreated = torrent.dateCreated
-        self.dateAdded = torrent.dateAdded
-        self.haveValid = torrent.haveValid
-        self.recheckProgress = torrent.recheckProgress
-        self.bandwidthPriority = torrent.bandwidthPriority
-        self.honorsSessionLimits = torrent.honorsSessionLimits
-        self.peerLimit = torrent.peerLimit
-        self.uploadLimited = torrent.uploadLimited
-        self.uploadLimit = torrent.uploadLimit
-        self.downloadLimited = torrent.downloadLimited
-        self.downloadLimit = torrent.downloadLimit
-        self.seedIdleMode = torrent.seedIdleMode
-        self.seedIdleLimit = torrent.seedIdleLimit
-        self.seedRatioMode = torrent.seedRatioMode
-        self.seedRatioLimit = torrent.seedRatioLimit
-        self.queuePosition = torrent.queuePosition
-        self.eta = torrent.eta
-        self.haveUnchecked = torrent.haveUnchecked
-        self.CommonInit()
-    }
+    
 }
 struct PieceRow: Identifiable {
     var id: UUID = UUID()
@@ -76,17 +31,67 @@ struct PieceCol: Identifiable {
 }
 
 
+struct TorrentActive: Codable {
+    public var name: String = ""
+    public var trId: TrId
+    public var activityDate: Date?
+    public var editDate: Date?
+    
+    private enum CodingKeys: String, CodingKey {
+        case name = "name"
+        case trId = "id"
+        case activityDate = "activityDate"
+        case editDate = "editDate"
+    }
+}
+
+struct JSONTorrentActiveArguments: Codable {
+    
+    public var torrents: [TorrentActive]
+    public var removed: [trId]?
+    private enum CodingKeys: String, CodingKey {
+        case torrents
+        case removed
+    }
+}
+
+struct JSONTorrentsActive: Codable {
+    public var arguments: JSONTorrentActiveArguments
+    public var result: String
+    
+    private enum CodingKeys: String, CodingKey {
+        case arguments
+        case result
+    }
+}
+
 class TransmissionRPCTests: XCTestCase {
     
     let MAXACROSS = 20
     var session: RPCSession!
     let sema = DispatchSemaphore(value: 0)
     var categorization: Categorization<Torrent>!
+    var array = Array<Torrent>()
+    var newArray: Array<Torrent>?
+    var latUpdate: Date!
+    
     override func setUp() {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         let url = URL(string: "http://jvega:Nmjcup0112*@diskstation.johnnyvega.net:9091/transmission/rpc")
         print(url!.absoluteString)
         session = try? RPCSession(withURL: url!, andTimeout:10)
+        self.categorization = Categorization()
+        
+        self.session?.getInfo(forTorrents: nil, withPriority: .veryHigh, andCompletionHandler: { torrents,_,error in
+         if error != nil {
+         print(error!.localizedDescription)
+         } else {
+            self.categorization.setItems(torrents!)
+         }
+         self.sema.signal()
+         })
+         sema.wait()
+        
     }
 
     override func tearDown() {
@@ -98,46 +103,55 @@ class TransmissionRPCTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        self.session?.getPieces(forTorrent: 4999, withPriority: .veryHigh) { pieces, error in
-            if error == nil {
-                let pieces = (pieces! as NSData)
-                var pointer = pieces.bytes
-                let maxrc = min(2231, self.MAXACROSS*self.MAXACROSS)
-                let accross = Int(ceil(sqrt(Double(maxrc))))
-                var shift = 0
-                var array: Array<PieceRow> = Array(repeating: PieceRow(accross), count: accross)
-                for index in 0..<maxrc {
-                    let col = index % accross
-                    let row = index / accross
-                    
-                    let c = pointer.load(as: UInt8.self)
-                    let filled = (c >> shift) & 0x1 != 0 ? true : false
-                    shift += 1
-                    if shift > 7 {
-                        shift = 0
-                        pointer += 1
-                    }
-                    array[row].cols.insert(PieceCol(filled: filled), at: col)
+        
+        self.measure {
+            
+            let lastUpdate = Date(timeIntervalSinceNow: -1800)
+            var arguments = JSONObject()
+            arguments[JSONKeys.fields] =  [JSONKeys.id, JSONKeys.name, JSONKeys.status, JSONKeys.activityDate]
+            
+            
+            let request = RPCRequest(forMethod: JSONKeys.torrent_get, withArguments: arguments, usingSession: self.session, andPriority: .veryHigh, dataCompletion:  { (data, error) in
+                
+                if error != nil {
+                    print("TransmissionRemoteSwiftUI: %@",error!.localizedDescription)
+                    self.sema.signal()
+                    return
                 }
-                DispatchQueue.main.async {
-                    print(array)
+                var torrents: [TorrentActive]?
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .secondsSince1970
+                    let response = try decoder.decode(JSONTorrentsActive.self, from: data!)
+                    torrents = response.arguments.torrents
+                } catch {
+                    self.sema.signal()
+                    return
                 }
-            } else {
-                DispatchQueue.main.async {
-                    print(error!.localizedDescription)
+                if let trIds = torrents?.filter({ $0.activityDate ?? Date(timeIntervalSince1970: 0) >= lastUpdate || $0.editDate ?? Date(timeIntervalSince1970: 0) >= lastUpdate }).map({$0.trId}),
+                    !(trIds.isEmpty)
+                {
+                    print("trIds: \(trIds)")
+                    self.session?.getInfo(forTorrents: trIds, withPriority: .veryHigh, andCompletionHandler: { torrents,_,error in
+                        
+                        if error != nil {
+                            print(error!.localizedDescription)
+                        } else if !(torrents?.isEmpty ?? true) {
+                            self.categorization.updateItems(with: torrents!)
+                        }
+                        self.sema.signal()
+                    })
                 }
-            }
-            self.sema.signal()
+
+                self.sema.signal()
+            })
+            self.session.addTorrentRequest(request)
+            self.sema.wait()
         }
-       sema.wait()
-//        print(trInfos.items.count)
     }
 
     func testPerformanceExample() {
         
-        self.measure {
-           
-        }
     }
     
 }

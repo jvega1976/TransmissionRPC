@@ -48,11 +48,18 @@ public extension RPCSession {
     ///     If the request's "ids" field was "recently-active", an array of Torrent Ids numbers of recently-removed torrents.
     /// - parameter error:
     ///     An error object that indicates why the request failed, or nil if the request was successful.
-    func getInfo(forTorrents trIds: [TrId]?, withPriority queuePriority: Operation.QueuePriority = .normal, andCompletionHandler completion: @escaping (_ torrents:[Torrent]?,_ removedTorrents: [TrId]?,_ error:Error?)->Void) {
-
-        let fields = [
+    func getInfo(_ fields: [JSONKey]? = nil, forTorrents trIds: [TrId]?, withPriority queuePriority: Operation.QueuePriority = .normal, andCompletionHandler completion: @escaping (_ torrents:[Torrent]?,_ removedTorrents: [TrId]?,_ error:Error?)->Void) {
+        
+        var torrentFields: [JSONKey]
+        
+        if let fields = fields {
+            torrentFields = fields
+        } else {
+            torrentFields = [
                 JSONKeys.activityDate,
+                JSONKeys.editDate,
                 JSONKeys.addedDate,
+                JSONKeys.startDate,
                 JSONKeys.bandwidthPriority,
                 JSONKeys.comment,
                 JSONKeys.creator,
@@ -96,8 +103,9 @@ public extension RPCSession {
                 JSONKeys.uploadLimited,
                 JSONKeys.uploadRatio
             ]
+        }
         var arguments = JSONObject()
-        arguments[JSONKeys.fields] = fields
+        arguments[JSONKeys.fields] = torrentFields
         if trIds != nil && !trIds!.isEmpty {
             arguments[JSONKeys.ids] = trIds == RecentlyActive ? JSONKeys.recently_active : trIds
         }

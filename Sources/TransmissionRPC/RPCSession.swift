@@ -88,7 +88,7 @@ open class RPCSession: NSObject, ObservableObject {
         torrentQueue.qualityOfService = .userInteractive
         sessionConfigQueue = OperationQueue()
         sessionConfigQueue.maxConcurrentOperationCount = 1
-        torrentQueue.qualityOfService = .userInteractive
+        sessionConfigQueue.qualityOfService = .utility
         
     }
     
