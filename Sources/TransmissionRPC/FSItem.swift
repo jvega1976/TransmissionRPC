@@ -97,7 +97,9 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
             }
             self.sizeString = ByteCountFormatter.formatByteCount(size)
             if let parent = self.parent {
-                parent.size = (parent.size - oldValue) + self.size
+                parent.size = parent.items.reduce(0, { size, item in
+                    size + (item.isFolder || item.isWanted ? item.size : 0)
+                })
             }
         }
     }
@@ -114,6 +116,12 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
                 //return !items!.contains(where: { !$0.isWanted })
                 parent.isWanted = parent.items.reduce(true, { isWanted, item in
                     return isWanted && item.isWanted
+                })
+            }
+            if !self.isFolder,
+                let parent = self.parent {
+                    parent.size = parent.items.reduce(0, { size, item in
+                        size + (item.isFolder || item.isWanted ? item.size : 0)
                 })
             }
         }

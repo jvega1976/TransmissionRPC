@@ -738,9 +738,9 @@ public extension RPCSession {
     /// This completion handler takes the following parameters:
     /// - parameter error: An error object that indicates why the request failed, or nil if the request was successful.
     ///
-    func setLocation(forTorrent trId: TrId, location directory: String, move flag: Bool = false, withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ error: Error?)->Void)  {
+    func setLocation(forTorrent trId: [TrId], location directory: String, move flag: Bool = false, withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ error: Error?)->Void)  {
         
-        let arguments = [JSONKeys.ids: [trId],
+        let arguments = [JSONKeys.ids: trId,
                          JSONKeys.location: directory,
                          JSONKeys.move: flag
             ] as JSONObject

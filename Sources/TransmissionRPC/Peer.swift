@@ -135,5 +135,19 @@ open class Peer: NSObject, Codable, ObservableObject, Identifiable {
         self.rateToClient = try values.decode(Int.self, forKey: .rateToClient)
         self.rateToPeer = try values.decode(Int.self, forKey: .rateToPeer)        
     }
-      
+    
+    
+    static func == (lhs: Peer, rhs: Peer) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    
+    static func != (lhs: Peer, rhs: Peer) -> Bool {
+        return lhs.id != rhs.id
+    }
+    
+    
+    open override func isEqual(_ object: Any?) -> Bool {
+        return self.id == (object as? Peer)?.id
+    }
 }

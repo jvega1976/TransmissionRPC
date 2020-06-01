@@ -9,7 +9,7 @@
 import Foundation
 
 //MARK: - Enumerations
-public enum TrackerState: Int, Codable
+@objc public enum TrackerState: Int, Codable
 {
     /* we won't (announce,scrape) this torrent to this tracker because
      * the torrent is stopped, or because of an error, or whatever */
@@ -23,9 +23,8 @@ public enum TrackerState: Int, Codable
     /* we're (announcing,scraping) this torrent right now */
     case active = 3
     
-    public static func stringValue(_ rawValue: RawValue) -> String {
-        let state = TrackerState(rawValue: rawValue)
-        switch state {
+    public var stringValue: String {
+        switch self {
             case .inactive:
                 return "Inactive"
             case .waiting:
@@ -34,25 +33,25 @@ public enum TrackerState: Int, Codable
                 return "Queued"
             case .active:
                 return "Active"
-            case .none:
+            default:
                 return ""
         }
     }
 }
 
 //MARK: - Tracker struct definition
-open class Tracker: NSObject, Codable, ObservableObject, Identifiable {
+open class Tracker: NSObject, Codable, ObservableObject, Identifiable  {
 
-    @Published public var announce: String = ""
-    @Published public var announceState: Int = TrackerState.inactive.rawValue
+    @Published public var announce: String = "http://server.unknown.com:9999"
+    @Published public var announceState: TrackerState = TrackerState.inactive
     @Published public var downloadCount:Int = 0
     @Published public var hasAnnounced: Bool = false
     @Published public var hasScraped: Bool = false
-    @Published public var host: String = ""
+    @Published public var host: String = "server.unknown.com"
     @Published public var trackerId: Int = 0
     @Published public var isBackup: Bool = false
     @Published public var lastAnnouncePeerCount: Int = 0
-    @Published public var lastAnnounceResult: String = ""
+    @Published public var lastAnnounceResult: String = "Unknown"
     @Published public var lastAnnounceStartTime: TimeInterval = 0
     @Published public var lastAnnounceSucceeded: Bool = false
     @Published public var lastAnnounceTime: TimeInterval = 0
@@ -65,7 +64,7 @@ open class Tracker: NSObject, Codable, ObservableObject, Identifiable {
     @Published public var leecherCount: Int = 0
     @Published public var nextAnnounceTime: TimeInterval = 0
     @Published public var nextScrapeTime: TimeInterval = 0
-    @Published public var scrape: String = ""
+    @Published public var scrape: String = "Unknown"
     @Published public var scrapeState: Int = 0
     @Published public var seederCount: Int = 0
     @Published public var tier: Int = 0
@@ -96,7 +95,7 @@ open class Tracker: NSObject, Codable, ObservableObject, Identifiable {
     }
     
     open var announceString: String {
-        return TrackerState.stringValue(self.announceState)
+        return self.announceState.stringValue
     }
    
     private enum CodingKeys: String, CodingKey {
@@ -128,11 +127,15 @@ open class Tracker: NSObject, Codable, ObservableObject, Identifiable {
         case tier
     }
     
+    public override init() {
+        super.init()
+    }
+    
     public required init(from decoder: Decoder) throws {
         super.init()
         let values = try decoder.container(keyedBy: CodingKeys.self)
         announce = try values.decode(String.self, forKey: .announce)
-        announceState = try values.decode(Int.self, forKey: .announceState)
+        announceState = try values.decode(TrackerState.self, forKey: .announceState)
         downloadCount = try values.decode(Int.self, forKey: .downloadCount)
         hasAnnounced = try values.decode(Bool.self, forKey: .hasAnnounced)
         hasScraped = try values.decode(Bool.self, forKey: .hasScraped)
@@ -188,4 +191,19 @@ open class Tracker: NSObject, Codable, ObservableObject, Identifiable {
         try container.encode(seederCount, forKey: .seederCount)
         try container.encode(tier, forKey: .tier)
     }
+    
+    static func == (lhs: Tracker, rhs: Tracker) -> Bool {
+        return lhs.trackerId == rhs.trackerId
+    }
+    
+    
+    static func != (lhs: Tracker, rhs: Tracker) -> Bool {
+        return lhs.trackerId != rhs.trackerId
+    }
+    
+    open override func isEqual(_ object: Any?) -> Bool {
+        return self.trackerId == (object as? Tracker)?.trackerId
+    }
 }
+
+

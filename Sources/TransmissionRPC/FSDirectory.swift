@@ -149,8 +149,12 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
                 //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
                 self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
-                self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
-                self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
+                if self.rpcIndexFiles[i]?.isWanted != file[JSONKeys.wanted] as! Bool {
+                    self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
+                }
+                if self.rpcIndexFiles[i]?.priorityInteger != file[JSONKeys.priority] as! Int {
+                    self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
+                }
             //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.isWanted)
             //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.priorityInteger)
             //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.bytesCompletedString)
@@ -165,8 +169,12 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent.bytesCompletedString)
                 //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
                 self.rpcIndexFiles[i]?.bytesCompleted = file.bytesCompleted
-                self.rpcIndexFiles[i]?.isWanted = file.wanted
-                self.rpcIndexFiles[i]?.priorityInteger = file.priority
+                if self.rpcIndexFiles[i]?.isWanted != file.wanted {
+                    self.rpcIndexFiles[i]?.isWanted = file.wanted
+                }
+                if  self.rpcIndexFiles[i]?.priorityInteger != file.priority {
+                    self.rpcIndexFiles[i]?.priorityInteger = file.priority
+                }
             //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.isWanted)
             //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.priorityInteger)
             //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
