@@ -747,20 +747,20 @@ public extension RPCSession {
         let request = RPCRequest(forMethod: JSONKeys.torrent_set_location, withArguments: arguments, usingSession: self, andPriority: queuePriority, dataCompletion: { (data, error) in
             if error != nil {
                 completion(error)
-                return
-            }
-            do {
-                let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .secondsSince1970
-                let response = try decoder.decode(JSONResponse.self, from: data!)
-                if response.result != "success" {
-                    let error = NSError(domain: "TransmissionRemote", code: 1999, userInfo: [NSLocalizedDescriptionKey: response.result])
+            } else {
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .secondsSince1970
+                    let response = try decoder.decode(JSONResponse.self, from: data!)
+                    if response.result != "success" {
+                        let error = NSError(domain: "TransmissionRemote", code: 1999, userInfo: [NSLocalizedDescriptionKey: response.result])
+                        completion(error)
+                    } else {
+                        completion(nil)
+                    }
+                } catch {
                     completion(error)
-                } else {
-                    completion(nil)
                 }
-            } catch {
-                completion(error)
             }
         })
         request.queuePriority = queuePriority

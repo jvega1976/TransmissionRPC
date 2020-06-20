@@ -128,6 +128,7 @@ open class RPCRequest: Operation {
         
         do {
             req.httpBody = try JSONSerialization.data(withJSONObject: requestMessage, options: [.prettyPrinted])
+            //print(req.httpBody!.string!)
         } catch {
             dataHandler(nil,error)
             return

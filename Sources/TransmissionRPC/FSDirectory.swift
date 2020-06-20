@@ -149,10 +149,10 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
                 //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
                 self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
-                if self.rpcIndexFiles[i]?.isWanted != file[JSONKeys.wanted] as! Bool {
+                if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as! Bool) {
                     self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
                 }
-                if self.rpcIndexFiles[i]?.priorityInteger != file[JSONKeys.priority] as! Int {
+                if self.rpcIndexFiles[i]?.priorityInteger != (file[JSONKeys.priority] as! Int) {
                     self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
                 }
             //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.isWanted)
