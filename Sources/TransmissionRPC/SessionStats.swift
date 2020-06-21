@@ -27,6 +27,16 @@ open class SessionStats: NSObject, Decodable, ObservableObject {
     @Published public var currentFilesAdded = 0
     @Published public var currentsessionCount = 0
     @Published public var currentSecondsActive: TimeInterval = 0
+    
+    @Published public var downloadSpeedString: String = ""
+    @Published public var uploadSpeedString: String = ""
+    @Published public var currentdownloadedBytesString: String = ""
+    @Published public var currentUploadedBytesString: String = ""
+    @Published public var cumulativeUploadedBytesString: String  = ""
+    @Published public var cumulativedownloadedBytesString: String = ""
+    @Published public var cumulativeSecondsActiveString: String = ""
+    @Published public var currentSecondsActiveString: String = ""
+    
 
     private enum CodingKeys: String, CodingKey {
         case activeTorrentCount = "activeTorrentCount"
@@ -55,6 +65,7 @@ open class SessionStats: NSObject, Decodable, ObservableObject {
     }
     
     required public init(from decoder: Decoder) throws {
+        super.init()
         let values = try decoder.container(keyedBy: CodingKeys.self)
         activeTorrentCount = try values.decode(Int.self, forKey: .activeTorrentCount)
         downloadSpeed = try values.decode(Int.self, forKey: .downloadSpeed)
@@ -75,11 +86,25 @@ open class SessionStats: NSObject, Decodable, ObservableObject {
         currentFilesAdded = try currentStats.decode(Int.self, forKey: .currentFilesAdded)
         currentsessionCount = try currentStats.decode(Int.self, forKey: .currentsessionCount)
         currentSecondsActive = try currentStats.decode(TimeInterval.self, forKey: .currentSecondsActive)
+        commonInit()
     }
     
     public override init() {
         super.init()
+        commonInit()
     }
+    
+    private func commonInit() {
+        self.downloadSpeedString = ByteCountFormatter.formatByteRate(self.downloadSpeed)
+        self.uploadSpeedString = ByteCountFormatter.formatByteRate(self.uploadSpeed)
+        self.currentUploadedBytesString = ByteCountFormatter.formatByteCount(self.currentUploadedBytes)
+        self.currentdownloadedBytesString = ByteCountFormatter.formatByteCount(self.currentdownloadedBytes)
+        self.cumulativeUploadedBytesString = ByteCountFormatter.formatByteCount(self.cumulativeUploadedBytes)
+        self.cumulativedownloadedBytesString = ByteCountFormatter.formatByteCount(self.cumulativedownloadedBytes)
+        self.currentSecondsActiveString = DateFormatter.formatHoursMinutes(self.currentSecondsActive)
+        self.cumulativeSecondsActiveString = DateFormatter.formatHoursMinutes(self.cumulativeSecondsActive)
+    }
+    
     
     public func update(with stats: SessionStats) {
         self.activeTorrentCount = stats.activeTorrentCount
@@ -97,6 +122,7 @@ open class SessionStats: NSObject, Decodable, ObservableObject {
         self.currentFilesAdded = stats.currentFilesAdded
         self.currentsessionCount = stats.currentsessionCount
         self.currentSecondsActive = stats.currentSecondsActive
+        self.commonInit()
     }
 }
 
