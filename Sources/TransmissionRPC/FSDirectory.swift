@@ -98,7 +98,7 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         var item = rootItem
         guard !indexPath.isEmpty else { return nil}
         while let index = indexPath.popFirst() {
-            item = item.items[index]
+            item = item.items![index]
         }
         return item
     }
@@ -106,7 +106,7 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
     
     public func childIndexes(for item: FSItem) -> [IndexPath] {
         var indexes = [IndexPath]()
-        for childItem in item.items  {
+        for childItem in item.items ?? [] {
             if childItem.isFolder {
                 indexes.append(contentsOf: childIndexes(for: childItem))
             }

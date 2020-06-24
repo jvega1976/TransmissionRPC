@@ -8,7 +8,6 @@
 
 import Foundation
 import Combine
-import Outline
 
 public let FSITEM_INDEXNOTFOUND = -1
 
@@ -19,7 +18,7 @@ public enum FilePriority: Int, Codable {
 }
 
 // MARK: - Class FSItem
-public final class FSItem: NSObject, ObservableObject, OutlineData {
+public final class FSItem: NSObject, ObservableObject {
     
     
     public var isExpandable: Bool {
@@ -97,7 +96,7 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
             }
             self.sizeString = ByteCountFormatter.formatByteCount(size)
             if let parent = self.parent {
-                parent.size = parent.items.reduce(0, { size, item in
+                parent.size = parent.items!.reduce(0, { size, item in
                     size + (item.isFolder || item.isWanted ? item.size : 0)
                 })
             }
@@ -114,13 +113,13 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
         didSet {
             if let parent = self.parent {
                 //return !items!.contains(where: { !$0.isWanted })
-                parent.isWanted = parent.items.reduce(true, { isWanted, item in
+                parent.isWanted = parent.items!.reduce(true, { isWanted, item in
                     return isWanted && item.isWanted
                 })
             }
             if !self.isFolder,
                 let parent = self.parent {
-                    parent.size = parent.items.reduce(0, { size, item in
+                    parent.size = parent.items!.reduce(0, { size, item in
                         size + (item.isFolder || item.isWanted ? item.size : 0)
                 })
             }
@@ -191,7 +190,7 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
         }
     }
     
-    @Published public var items: [FSItem] = []
+    @Published public var items: [FSItem]?
     
     /// Return File item positioned in a particular IndexPath position
     ///
@@ -199,9 +198,9 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
     /// return: the file Item positioned at the IndexPath
     public func item(atIndexPath indexPath: IndexPath) -> FSItem? {
         var indexPath = indexPath
-        var item = self
+        var item: FSItem = self
         while let index = indexPath.popFirst() {
-            item = item.items[index]
+            item = item.items![index]
         }
         return item
         
@@ -235,16 +234,16 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
             if !isFolder {
                 _totalFilesCount = 1
             }  else {
-                _totalFilesCount = items.reduce(0, { x , y in
+                _totalFilesCount = items?.reduce(0, { x , y in
                     x + y.totalFilesCount
-                })
+                }) ?? 0
             }
         }
         return _totalFilesCount
     }
     
     public var filesCount: Int {
-        return items.count
+        return items?.count ?? 0
     }
     
     
@@ -355,7 +354,7 @@ public final class FSItem: NSObject, ObservableObject, OutlineData {
         
         item.level = self.level + 1
         item.parent = self
-        item.indexPath = self.indexPath.appending(self.items.count)
+        item.indexPath = self.indexPath.appending(self.items?.count ?? 0)
         fsItems.append(item)
         return item
     }

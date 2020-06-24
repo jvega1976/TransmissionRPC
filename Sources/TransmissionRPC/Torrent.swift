@@ -21,6 +21,7 @@ public typealias trId = Int
 @objc(Torrent)
 open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
 
+    // MARK: - Class CodingKeys
      private enum CodingKeys: String, CodingKey, CaseIterable {
         case activityDate = "activityDate"
         case editDate = "editDate"
@@ -69,6 +70,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         case uploadRatio = "uploadRatio"
     }
     
+    // MARK: - Class Properties
     @Published public var trId: trId = 0
     @Published public var percentDone: Double = 0.00
     @Published public var name: String!
@@ -114,9 +116,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var queuePosition: Int = 0
     @Published public var eta: Int = 0
     @Published public var haveUnchecked: Int = 0
-//    public var piecesBitmap: NSData!
     
-    //Computed properties
+    // MARK: - Class computed properties
     @Published public private (set) var id: Int = 0
     @Published public private (set) var isError: Bool = false
     @Published public private (set) var isDownloading: Bool = false
@@ -136,6 +137,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public private (set) var peersDetail: String = ""
     @Published public private (set) var statusString: String = ""
 
+    
+    /// Decoder Initializer
     public required init(from decoder: Decoder) throws {
         super.init()
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -238,6 +241,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         try container.encode(status, forKey: .status)
     }
     
+    
+    /// required Initializer
     public override init() {
         super.init()
         trId = Int.random(in: 100000...999999)
@@ -340,6 +345,9 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         self.statusString = self.status.statusString
     }
     
+    ///
+    /// update the torrent propierties copying propierties from torrent passed as parameter
+    ///
     open func update(with torrent: Torrent) {
         self.trId = torrent.trId
         self.name = torrent.name
@@ -389,32 +397,9 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         self.CommonInit()
     }
     
-    public class func propertyStringName(stringValue value: String) -> String? {
-        return CodingKeys.allCases.first(where: {key in
-            return key.rawValue.camelCased  == value})?.rawValue
-    }
-
-    
-    public var jsonObject: JSONObject {
-        get {
-            var rpcMessage = JSONObject()
-            rpcMessage[JSONKeys.bandwidthPriority] = bandwidthPriority
-            rpcMessage[JSONKeys.downloadLimit] = downloadLimit
-            rpcMessage[JSONKeys.downloadLimited] = downloadLimited
-            rpcMessage[JSONKeys.honorsSessionLimits] = honorsSessionLimits
-            rpcMessage[JSONKeys.peer_limit] = peerLimit
-            rpcMessage[JSONKeys.queuePosition] = queuePosition
-            rpcMessage[JSONKeys.seedIdleLimit] = seedIdleLimit
-            rpcMessage[JSONKeys.seedIdleMode] = seedIdleMode
-            rpcMessage[JSONKeys.seedRatioLimit] = seedRatioLimit
-            rpcMessage[JSONKeys.seedRatioMode] = seedRatioMode
-            rpcMessage[JSONKeys.uploadLimit] = uploadLimit
-            rpcMessage[JSONKeys.uploadLimited] = uploadLimited
-            return rpcMessage
-        }
-    }
 }
-
+ 
+ 
 // MARK: - Comparable Protocol adoption
 extension Torrent: Comparable {
     
