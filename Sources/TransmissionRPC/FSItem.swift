@@ -172,7 +172,7 @@ public final class FSItem: NSObject, ObservableObject {
     @Published public var rpcIndex:Int = 0
     
     /// Holds subfolders/files - if this is a Folder
-    private var fsItems: [FSItem] = [] {
+    private var fsItems: Array<FSItem> = [] {
         didSet {
             if filterPredicate != nil {
                 let result = fsItems.filter({ $0.satisfyFilterPredicate })
@@ -190,7 +190,7 @@ public final class FSItem: NSObject, ObservableObject {
         }
     }
     
-    @Published public var items: [FSItem]?
+    @Published public var items: Array<FSItem>?
     
     /// Return File item positioned in a particular IndexPath position
     ///
@@ -346,7 +346,7 @@ public final class FSItem: NSObject, ObservableObject {
     }
     
     /// Holds parent reference
-    @Published public var parent: FSItem?
+    @Published public var parent: FSItem? = nil
     
     /// Add new item to folder item
     public func add(withName name: String, isFolder: Bool) -> FSItem {
@@ -495,15 +495,16 @@ extension FSItem: Comparable {
     }
     
     public static func == (lhs: FSItem, rhs: FSItem) -> Bool {
-        return lhs.fullName == rhs.fullName
+        return lhs.fullName == rhs.fullName && lhs.items == rhs.items
     }
     
     public static func != (lhs: FSItem, rhs: FSItem) -> Bool {
-        return lhs.fullName != rhs.fullName
+        return lhs.fullName != rhs.fullName || lhs.items != rhs.items
     }
     
     override public func isEqual(_ object: Any?) -> Bool {
-        return (object as? FSItem)?.fullName == self.fullName
+        guard let object = object as? FSItem else { return false }
+        return self.fullName.isEqual(object.fullName) && self.items == object.items
     }
     
     #if os(macOS)

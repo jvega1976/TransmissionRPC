@@ -48,7 +48,7 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         self.rootItem = FSItem(name: "", isFolder: true) // init root element (always folder)
         self.id = 1
         super.init()
-        self.rootItem.indexPath = IndexPath()
+        self.rootItem.level = -1
         self.folderItems = [:]
     }
     
@@ -70,6 +70,8 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         }
         self.sort()
         rpcIndexFiles = rootItem.rpcFileIndexes
+        rootItem = rootItem.items!.first!
+        rootItem.parent = nil
     }
     
     
@@ -85,6 +87,7 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         set {
             //self.rootItem.objectWillChange.send()
             rootItem.sortPredicate = newValue
+    
         }
     }
     

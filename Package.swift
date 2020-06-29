@@ -26,7 +26,11 @@ let package = Package(
         .target(
             name: "TransmissionRPC",
             dependencies: [],
-            path: "Sources"),
+            path: "Sources",
+            swiftSettings: [
+                .define("BUILD_LIBRARY_FOR_DISTRIBUTION=YES", .when(configuration: .release)),
+                .define("LOCALIZED_STRING_SWIFTUI_SUPPORT=YES", .when(configuration: .release)),
+        ]),
         .testTarget(
             name: "TransmissionRPCTests",
             dependencies: ["TransmissionRPC"]),

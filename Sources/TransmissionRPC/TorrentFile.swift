@@ -19,7 +19,7 @@ private let kAnnounceListKey = "announce-list"
 private let kEmptyString = ""
 
 open class TorrentFile: NSObject {
-   private var fileData: Data!
+   private var fileData: Data
    private var benDict: Bencode!
    public var fs: FSDirectory! // cached file list directory
    private var trList: [String]! // cached tracker list array
@@ -141,12 +141,24 @@ open class TorrentFile: NSObject {
         return fileData
     }
 
-    public init(fileURL: URL) {
+    public init(fileURL: URL) throws {
         do {
             fileData = try Data(contentsOf: fileURL)
-            if (fileData != nil) {
-                benDict = Bencode(file: fileURL)
-            }
-        } catch { print(error) }
+            benDict = Bencode(file: fileURL)
+            super.init()
+        } catch { print(error)
+                throw error
+        }
     }
+    
+    public init(fileData: Data?) throws {
+        guard let fileData = fileData else { throw DataError.dataIsNull }
+        self.fileData = fileData
+        benDict = Bencode(bytes: Array(fileData))
+        super.init()
+    }
+}
+
+enum DataError: Error  {
+    case dataIsNull
 }

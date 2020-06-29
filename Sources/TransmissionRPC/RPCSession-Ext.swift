@@ -48,7 +48,7 @@ public extension RPCSession {
     ///     If the request's "ids" field was "recently-active", an array of Torrent Ids numbers of recently-removed torrents.
     /// - parameter error:
     ///     An error object that indicates why the request failed, or nil if the request was successful.
-    func getInfo(_ fields: [JSONKey]? = nil, forTorrents trIds: [TrId]?, withPriority queuePriority: Operation.QueuePriority = .normal, andCompletionHandler completion: @escaping (_ torrents:[Torrent]?,_ removedTorrents: [TrId]?,_ error:Error?)->Void) {
+    func getInfo(_ fields: [JSONKey]? = nil, forTorrents trIds: [TrId]?, withPriority queuePriority: Operation.QueuePriority = .normal, andCompletionHandler completion: @escaping (_ torrents: ContiguousArray<Torrent>?,_ removedTorrents: [TrId]?,_ error:Error?)->Void) {
         
         var torrentFields: [JSONKey]
         

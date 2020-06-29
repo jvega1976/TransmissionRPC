@@ -17,7 +17,7 @@ import Foundation
 */
 public struct JSONTorrentsArguments: Codable {
     
-    public var torrents: [Torrent]
+    public var torrents: ContiguousArray<Torrent>
     public var removed: [trId]?
     private enum CodingKeys: String, CodingKey {
         case torrents
