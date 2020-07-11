@@ -18,72 +18,36 @@ public enum FilePriority: Int, Codable {
 }
 
 // MARK: - Class FSItem
-public final class FSItem: NSObject, ObservableObject {
+public final class FSItem: NSObject, ObservableObject, Identifiable {
     
-    
-    public var isExpandable: Bool {
-        get {
-         return self.isFolder
-        }
+    public var id: String {
+        return fullName
     }
     
     /// Returns YES if this is a folder
-    @Published public var isFolder: Bool = false
-    
-    
-    @Published public var filterPredicate: ((FSItem)->Bool)? {
-        didSet {
-            if self.isFolder {
-                for file in self.fsItems {
-                    file.filterPredicate = self.filterPredicate
-                }
-            }
-        }
+    public var isFolder: Bool {
+        return items != nil
     }
     
     /// File name including path
     @Published public var fullName = ""
     
     /// File folder name (w/o starting paths)
-    @Published public var name = "" {
+    @Published public var name = ""
+    
+    
+    @Published public var bytesCompleted: Int  = 0 {
         didSet {
-            if let parent = self.parent {
-                self.fullName = parent.fullName + "/" + self.name
-            } else {
-                self.fullName = self.name
+            if !isFolder && size > 0 {
+                self.downloadProgress = Float(bytesCompleted) / Float(size)
             }
+            self.bytesCompletedString = ByteCountFormatter.formatByteCount(bytesCompleted)
+            guard let parent = self.parent else { return }
+            parent.bytesCompleted = parent.fsItems!.reduce(0, { x, y in
+                x + y.bytesCompleted })
         }
     }
-    
-    ///IndexPath representing the location of the item location in the Directory tree
-    @Published public var indexPath: IndexPath!
-    
-    /// Bytes downloaded
-    private var _bytesCompleted: Int = 0 {
-        didSet {
-            if size > 0 {
-                self.downloadProgress = Float(_bytesCompleted) / Float(size)
-            }
-             self.bytesCompletedString = ByteCountFormatter.formatByteCount(_bytesCompleted)
-        }
-    }
-    
-    public var bytesCompleted: Int  = 0 {
-       didSet {
-            if !isFolder {
-                self._bytesCompleted = bytesCompleted
-                self.parent?.recalculateBytesCompleted()
-            }
-        }
-    }
-    
-    private func recalculateBytesCompleted() {
-        self._bytesCompleted = fsItems.reduce(0, { x, y in
-            x + y._bytesCompleted
-        })
-        self.parent?.recalculateBytesCompleted()
-    }
-    
+  
     /// Bytes downloaded - string representation
     @Published public var bytesCompletedString: String = ""
     
@@ -92,14 +56,12 @@ public final class FSItem: NSObject, ObservableObject {
     @Published public var size: Int = 0 {
         didSet {
             if size > 0 {
-                downloadProgress = Float(_bytesCompleted) / Float(size)
+                downloadProgress = Float(bytesCompleted) / Float(size)
             }
             self.sizeString = ByteCountFormatter.formatByteCount(size)
-            if let parent = self.parent {
-                parent.size = parent.items!.reduce(0, { size, item in
-                    size + (item.isFolder || item.isWanted ? item.size : 0)
-                })
-            }
+            guard let parent = self.parent else { return }
+            parent.size = parent.fsItems!.reduce(0, { size, item in
+                size + (item.isFolder || item.isWanted ? item.size : 0) })
         }
     }
     
@@ -127,19 +89,14 @@ public final class FSItem: NSObject, ObservableObject {
     }
     
     /// Priority of this file/folder
-    private var _priority: FilePriority = .normal {
-        didSet {
-            self.priorityInteger = _priority.rawValue
-        }
-    }
     
-    public var priority: FilePriority = .normal {
+    @Published public var priority: FilePriority = .normal {
         didSet {
-            if !isFolder {
-                _priority = priority
-            } else {
-                _priority = fsItems.contains(where: {$0._priority == .low}) ? .low : ( fsItems.contains(where: {$0._priority == .high}) ? .high : .normal)
+            if self.priorityInteger != self.priority.rawValue {
+                self.priorityInteger = self.priority.rawValue
             }
+            guard let parent = self.parent else { return }
+            parent.priority = parent.fsItems!.contains(where: {$0.priority == .low}) ? .low : (parent.fsItems!.contains(where: {$0.priority == .high}) ? .high : .normal)
         }
     }
     
@@ -152,10 +109,15 @@ public final class FSItem: NSObject, ObservableObject {
             case.high:
                 return "High"
         }
-        
     }
     
-    @Published public var priorityInteger: Int = 0 
+    @Published public var priorityInteger: Int = 0 {
+        didSet {
+            guard let priority = FilePriority(rawValue: self.priorityInteger) ,
+                  self.priority != priority  else { return }
+            self.priority = priority
+        }
+    }
 
     
     /// Download progress for file/folder (0 ... 1)
@@ -172,92 +134,21 @@ public final class FSItem: NSObject, ObservableObject {
     @Published public var rpcIndex:Int = 0
     
     /// Holds subfolders/files - if this is a Folder
-    private var fsItems: Array<FSItem> = [] {
-        didSet {
-            if filterPredicate != nil {
-                let result = fsItems.filter({ $0.satisfyFilterPredicate })
-                if !(result.isEmpty){
-                    self.items = result
-                } else {
-                    if fsItems.contains(where: { item in item.isFolder}) {
-                        self.items = fsItems
-                    }
-                    self.items = result
-                }
-            } else {
-                self.items = fsItems
-            }
-        }
-    }
+    fileprivate var fsItems: Array<FSItem>? = nil
     
-    @Published public var items: Array<FSItem>?
+    @Published public var items: Array<FSItem>? = nil
     
-    /// Return File item positioned in a particular IndexPath position
-    ///
-    /// - parameter indexPath: Array of indexPath of file item
-    /// return: the file Item positioned at the IndexPath
-    public func item(atIndexPath indexPath: IndexPath) -> FSItem? {
-        var indexPath = indexPath
-        var item: FSItem = self
-        while let index = indexPath.popFirst() {
-            item = item.items![index]
-        }
-        return item
-        
-    }
-    
-    
-    func reindexChildren() {
-        for (index,item) in fsItems.enumerated()  {
-            item.indexPath = self.indexPath.appending(index)
-        }
-    }
 
-    
-    fileprivate var satisfyFilterPredicate: Bool {
-        if !self.isFolder {
-            return filterPredicate!(self)
-        } else {
-            return fsItems.reduce(false) { (result: Bool, item: FSItem) -> Bool in
-                return result || item.satisfyFilterPredicate
-            }
-        }
-    }
-    
     /// Holds level of this file/folder
     @Published public var level: Int = 0
     
-    /// Get count of files in this folder
-    private var _totalFilesCount: Int = -1
-    public var totalFilesCount: Int {
-        if _totalFilesCount == -1 {
-            if !isFolder {
-                _totalFilesCount = 1
-            }  else {
-                _totalFilesCount = items?.reduce(0, { x , y in
-                    x + y.totalFilesCount
-                }) ?? 0
-            }
-        }
-        return _totalFilesCount
-    }
-    
-    public var filesCount: Int {
-        return items?.count ?? 0
-    }
-    
-    
-    
-    /// Get count of subfolders in this folder
-    private(set) var subfoldersCount = 0
-    
-    
+
     /// Returns RPC file indexes
     
     public var rpcFileIndexes: [Int: FSItem] {
         var rpcFileIndexes = [Int: FSItem]()
         if isFolder {
-            for i in fsItems {
+            for i in fsItems ?? [] {
                 if !(i.isFolder) {
                     rpcFileIndexes[i.rpcIndex] = i
                 } else {
@@ -272,75 +163,12 @@ public final class FSItem: NSObject, ObservableObject {
     public var rpcIndexes: [Int] {
         var indexes = [Int]()
         if isFolder {
-            for i in fsItems {
+            for i in fsItems ?? [] {
                 indexes.append(contentsOf: i.rpcIndexes)
             }
         }
         else {
             indexes.append(self.rpcIndex)
-        }
-        return indexes
-    }
-    
-    /// Returns RPC wanted file indexes
-    public var rpcFileIndexesWanted: [Int]? {
-        var indexes: [Int]? = nil
-        if isFolder {
-            indexes = []
-            for i in fsItems {
-                if !i.isFolder && i.isWanted {
-                    indexes!.append(i.rpcIndex)
-                } else {
-                    indexes = indexes! + (i.rpcFileIndexesWanted ?? [])
-                }
-            }
-        }
-        return indexes
-    }
-    /// Returns RPC unwanted file indexes
-    
-    public var rpcFileIndexesUnwanted: [Int]? {
-        var indexes: [Int]? = nil
-        if isFolder {
-            indexes = []
-            for i in fsItems {
-                if !i.isFolder && !i.isWanted {
-                    indexes!.append(i.rpcIndex)
-                } else {
-                    indexes = indexes! + (i.rpcFileIndexesUnwanted ?? [])
-                }
-            }
-        }
-        return indexes
-    }
-
-    public var rpcFileIndexesHighPriority: [Int]? {
-        var indexes: [Int]? = nil
-    
-        if isFolder {
-            indexes = []
-            for i in fsItems {
-                if !i.isFolder && (i.priority == .high) {
-                    indexes!.append(i.rpcIndex)
-                } else {
-                    indexes!.append(contentsOf: (i.rpcFileIndexesHighPriority ?? []))
-                }
-            }
-        }
-        return indexes
-    }
-    
-    public var rpcFileIndexesLowPriority: [Int]? {
-        var indexes: [Int]? = nil
-        if isFolder {
-            indexes = []
-            for i in fsItems {
-                if !i.isFolder && (i.priority == .low) {
-                    indexes!.append(i.rpcIndex)
-                } else {
-                    indexes!.append(contentsOf: i.rpcFileIndexesLowPriority ?? [])
-                }
-            }
         }
         return indexes
     }
@@ -354,8 +182,8 @@ public final class FSItem: NSObject, ObservableObject {
         
         item.level = self.level + 1
         item.parent = self
-        item.indexPath = self.indexPath.appending(self.items?.count ?? 0)
-        fsItems.append(item)
+        fsItems!.append(item)
+        items!.append(item)
         return item
     }
 
@@ -364,14 +192,17 @@ public final class FSItem: NSObject, ObservableObject {
         super.init()
         self.level = 0
         self.name = name
-        self.isFolder = isFolder
         self.size = 0
         self.sizeString = ""
         self.bytesCompleted = 0
         self.isWanted = true
-        self.indexPath = IndexPath()
         if isFolder {
+            fsItems = []
             items = []
+        }
+        else {
+            fsItems = nil
+            items = nil
         }
     }
     
@@ -379,63 +210,38 @@ public final class FSItem: NSObject, ObservableObject {
         super.init()
         self.level = 0
         self.name = ""
-        self.isFolder = false
         self.size = 0
         self.bytesCompleted = 0
         self.sizeString = ""
         self.isWanted = true
-        self.indexPath = IndexPath()
         if isFolder {
+            fsItems = []
             items = []
         }
     }
     
-    
-    // add item to children, if it is already exists
-    // return existing item
-    /*public override var description: String {
-        var spaces = ""
-        for _ in 0..<level {
-            spaces += "  "
-        }
-        
-        if !isFolder {
-            return "\(spaces)\(name)!\n"
-        }
-        
-        var s = "\(spaces)/\(name)\n"
-        
-        if !isCollapsed {
-            for item in items {
-                s += item.description
-            }
-        }
-        
-        return s
-    }*/
-    
-    public var sortPredicate: ((FSItem,FSItem)->Bool)? {
-        didSet {
-            self.sort()
-            for file in self.fsItems {
-                file.sortPredicate = self.sortPredicate
-            }
-//            self.items = self.fsItems
-        }
-    }
-    
-    
-    func sort() {
+
+    func sort(by sortPredicate: (FSItem,FSItem)->Bool) {
         if self.isFolder {
-            if sortPredicate != nil {
-                fsItems.sort(by: sortPredicate!)
-            } else {
-                fsItems.sort()
+            items!.forEach {item in
+                item.sort(by: sortPredicate)
             }
-            reindexChildren()
+            items!.sort(by: sortPredicate)
         }
     }
     
+    func filter(_ filterPredicate: ((FSItem)->Bool)?) {
+        if self.isFolder {
+            items!.forEach {item in
+                item.filter(filterPredicate)
+            }
+            if let filterPredicate = filterPredicate {
+                items = fsItems!.filter(filterPredicate)
+            } else {
+                items = fsItems
+            }
+        }
+    }
 }
 
 // MARK: - Comparable Protocol extension
@@ -495,17 +301,17 @@ extension FSItem: Comparable {
     }
     
     public static func == (lhs: FSItem, rhs: FSItem) -> Bool {
-        return lhs.fullName == rhs.fullName && lhs.items == rhs.items
+        return lhs.fullName == rhs.fullName && lhs.isFolder == rhs.isFolder
     }
     
     public static func != (lhs: FSItem, rhs: FSItem) -> Bool {
-        return lhs.fullName != rhs.fullName || lhs.items != rhs.items
+        return lhs.fullName != rhs.fullName
     }
     
-    override public func isEqual(_ object: Any?) -> Bool {
-        guard let object = object as? FSItem else { return false }
-        return self.fullName.isEqual(object.fullName) && self.items == object.items
-    }
+   override public func isEqual(_ object: Any?) -> Bool {
+        guard let object = object as? FSItem else { return false}
+        return self.fullName == object.fullName && self.isFolder == object.isFolder
+   }
     
     #if os(macOS)
     override public func isEqual(to object: Any?) -> Bool {
@@ -533,7 +339,7 @@ extension FSItem {
         let isFolder = !pathComponents.isEmpty
         
         var newItem: FSItem
-        if let item = self.fsItems.first(where: {$0.name == itemName}) {
+        if let item = self.fsItems!.first(where: {$0.name == itemName}) {
            newItem = item
         }
         else {

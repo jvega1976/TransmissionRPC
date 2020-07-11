@@ -118,7 +118,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var haveUnchecked: Int = 0
     
     // MARK: - Class computed properties
-    @Published public private (set) var id: Int = 0
+
     @Published public private (set) var isError: Bool = false
     @Published public private (set) var isDownloading: Bool = false
     @Published public private (set) var isWaiting: Bool = false
@@ -137,6 +137,10 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public private (set) var peersDetail: String = ""
     @Published public private (set) var statusString: String = ""
 
+    
+    public var id: Int  {
+        return self.trId
+    }
     
     /// Decoder Initializer
     public required init(from decoder: Decoder) throws {
@@ -252,7 +256,6 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     }
     
     public func CommonInit()->Void {
-        self.id = self.trId
         self.isError = self.errorString.count > 0 && self.errorNumber != 0
         self.isDownloading = self.status == .download
         self.isWaiting = self.status == .downloadWait || self.status == .seedWait || self.status == .checkWait

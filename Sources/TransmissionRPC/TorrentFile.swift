@@ -143,8 +143,10 @@ open class TorrentFile: NSObject {
 
     public init(fileURL: URL) throws {
         do {
+            fileURL.startAccessingSecurityScopedResource()
             fileData = try Data(contentsOf: fileURL)
             benDict = Bencode(file: fileURL)
+            fileURL.stopAccessingSecurityScopedResource()
             super.init()
         } catch { print(error)
                 throw error

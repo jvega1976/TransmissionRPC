@@ -27,16 +27,6 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
     private var folderItems = [AnyHashable : Any]()
     private var rpcIndexFiles = [Int: FSItem]()
     
-    /// Get count of items in directory
-    private var _count = -1
-    public var count: Int {
-        get {
-            if _count == -1 {
-                _count = rootItem.filesCount
-            }
-            return _count
-        }
-    }
     
     @Published public var id: Int
     
@@ -48,7 +38,6 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         self.rootItem = FSItem(name: "", isFolder: true) // init root element (always folder)
         self.id = 1
         super.init()
-        self.rootItem.level = -1
         self.folderItems = [:]
     }
     
@@ -68,54 +57,40 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             file[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
             rootItem.addPathComponents(withJSONFileInfo: &file, jsonFileStatInfo: fileStats[i], rpcIndex: i)
         }
+        self.filter()
         self.sort()
         rpcIndexFiles = rootItem.rpcFileIndexes
-        rootItem = rootItem.items!.first!
-        rootItem.parent = nil
     }
     
     
     /// Sort all folders/files included in directory
     public func sort() {
-        rootItem.sort()
+        if let predicate = self.sortPredicate {
+            rootItem.sort(by: predicate)
+        } else {
+            rootItem.sort(by: <)
+        }
     }
+    
+    public func filter() {
+        var finalFilter: ((FSItem)->Bool)? = nil
+        if let filterPredicate = filterPredicate {
+            finalFilter = { item in filterPredicate(item) || !(item.items?.isEmpty ?? true) }
+        }
+        rootItem.filter(finalFilter)
+    }
+    
     
     public var sortPredicate: ((FSItem,FSItem)->Bool)? {
-        get {
-            return rootItem.sortPredicate
-        }
-        set {
-            //self.rootItem.objectWillChange.send()
-            rootItem.sortPredicate = newValue
-    
+        didSet {
+            self.sort()
         }
     }
     
-    
-    /// Return File item positioned in a particular IndexPath position
-    ///
-    /// - parameter indexPath: Array of indexPath of file item
-    /// return: the file Item positioned at the IndexPath
-    public func item(atIndexPath indexPath: IndexPath) -> FSItem? {
-        var indexPath = indexPath
-        var item = rootItem
-        guard !indexPath.isEmpty else { return nil}
-        while let index = indexPath.popFirst() {
-            item = item.items![index]
+    public var filterPredicate: ((FSItem)->Bool)? {
+        didSet {
+            self.filter()
         }
-        return item
-    }
-    
-    
-    public func childIndexes(for item: FSItem) -> [IndexPath] {
-        var indexes = [IndexPath]()
-        for childItem in item.items ?? [] {
-            if childItem.isFolder {
-                indexes.append(contentsOf: childIndexes(for: childItem))
-            }
-            indexes.append(childItem.indexPath)
-        }
-        return indexes
     }
     
     
@@ -147,40 +122,26 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
     public func updateFSDir(usingStats fileStats:[JSONObject]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.isWanted)
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.priorityInteger)
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
-                //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
-                self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
-                if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as! Bool) {
-                    self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
-                }
-                if self.rpcIndexFiles[i]?.priorityInteger != (file[JSONKeys.priority] as! Int) {
-                    self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
-                }
-            //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.isWanted)
-            //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.priorityInteger)
-            //rpcIndexFiles[i]?.parent?.didChangeValue(for: \.parent?.bytesCompletedString)
+            self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
+            if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as! Bool) {
+                self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
+            }
+            if self.rpcIndexFiles[i]?.priorityInteger != (file[JSONKeys.priority] as! Int) {
+                self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
+            }
         }
     }
     
     public func updateFSDir(usingStats fileStats:[FileStat]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent.isWanted)
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent.priorityInteger)
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent.bytesCompletedString)
-                //self.rpcIndexFiles[i]?.parent?.objectWillChange.send()
-                self.rpcIndexFiles[i]?.bytesCompleted = file.bytesCompleted
-                if self.rpcIndexFiles[i]?.isWanted != file.wanted {
-                    self.rpcIndexFiles[i]?.isWanted = file.wanted
-                }
-                if  self.rpcIndexFiles[i]?.priorityInteger != file.priority {
-                    self.rpcIndexFiles[i]?.priorityInteger = file.priority
-                }
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.isWanted)
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for: \.parent?.priorityInteger)
-            //rpcIndexFiles[i]?.parent?.willChangeValue(for:\.parent?.bytesCompletedString)
+            self.rpcIndexFiles[i]?.bytesCompleted = file.bytesCompleted
+            if self.rpcIndexFiles[i]?.isWanted != file.wanted {
+                self.rpcIndexFiles[i]?.isWanted = file.wanted
+            }
+            if  self.rpcIndexFiles[i]?.priorityInteger != file.priority {
+                self.rpcIndexFiles[i]?.priorityInteger = file.priority
+            }
         }
     }
     
@@ -250,12 +211,11 @@ extension FSDirectory {
             // cache folder item
             if isFolder {
                 folderItems[cPath] = levelItem
-                levelItem.fullName = (cPath as NSString).substring(to: cPath.count - 1)
-                
                 //os_log(@"%@", levelItem.fullName);
             } else {
                 levelItem.rpcIndex = rpcIndex
             }
+            levelItem.fullName = (cPath as NSString).substring(to: cPath.count - 1)
         }
         rpcIndexFiles = rootItem.rpcFileIndexes
         return levelItem
