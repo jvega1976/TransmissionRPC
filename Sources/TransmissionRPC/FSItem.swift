@@ -61,7 +61,7 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
             self.sizeString = ByteCountFormatter.formatByteCount(size)
             guard let parent = self.parent else { return }
             parent.size = parent.fsItems!.reduce(0, { size, item in
-                size + (item.isFolder || item.isWanted ? item.size : 0) })
+                size + (item.isFolder || (item.isWanted ?? false) ? item.size : 0) })
         }
     }
     
@@ -71,18 +71,26 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
     
     /// Returns YES if this file/folder Wanted
     
-    @Published public var isWanted: Bool = true {
+    @Published public var isWanted: Bool? = true {
         didSet {
             if let parent = self.parent {
                 //return !items!.contains(where: { !$0.isWanted })
-                parent.isWanted = parent.items!.reduce(true, { isWanted, item in
-                    return isWanted && item.isWanted
-                })
+                if parent.items!.allSatisfy({ item in
+                    item.isWanted ?? false
+                }) {
+                    self.parent?.isWanted = true
+                } else if parent.items!.allSatisfy({ item in
+                    !(item.isWanted ?? true)
+                }) {
+                    self.parent?.isWanted = false
+                } else {
+                    self.parent?.isWanted = nil
+                }
             }
             if !self.isFolder,
                 let parent = self.parent {
                     parent.size = parent.items!.reduce(0, { size, item in
-                        size + (item.isFolder || item.isWanted ? item.size : 0)
+                        size + (item.isFolder || (item.isWanted ?? false) ? item.size : 0)
                 })
             }
         }
@@ -242,6 +250,20 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
             }
         }
     }
+    
+    func findItem(withName name: String) -> FSItem? {
+        if !self.isFolder && self.fullName == name {
+            return self
+        } else if self.isFolder {
+            for item in items ?? [] {
+                if let found = item.findItem(withName: name) {
+                    return found
+                }
+            }
+        }
+        return nil
+    }
+    
 }
 
 // MARK: - Comparable Protocol extension
@@ -363,7 +385,7 @@ extension FSItem {
             let size = fileInfo[JSONKeys.length] as! Int
             newItem.size = size
             newItem.bytesCompleted = bytesCompleted
-            newItem.isWanted = fileStatInfo[JSONKeys.wanted] as! Bool
+            newItem.isWanted = fileStatInfo[JSONKeys.wanted] as? Bool
             newItem.priorityInteger = fileStatInfo[JSONKeys.priority] as? Int ?? 0
         }
     }

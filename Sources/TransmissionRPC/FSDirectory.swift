@@ -98,9 +98,13 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         return rpcIndexFiles[rpcIndex]
     }
     
+    public func item(withName name: String) -> FSItem? {
+        return rootItem.findItem(withName: name)
+    }
+    
     public var rpcIndexesUnwanted: [Int] {
         let indexes = rpcIndexFiles.filter { (index, item) in
-            !item.isWanted
+            !(item.isWanted ?? false)
         }
         return Array(indexes.keys)
     }
@@ -123,8 +127,8 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
             self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
-            if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as! Bool) {
-                self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as! Bool
+            if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as? Bool) {
+                self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as? Bool
             }
             if self.rpcIndexFiles[i]?.priorityInteger != (file[JSONKeys.priority] as! Int) {
                 self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
