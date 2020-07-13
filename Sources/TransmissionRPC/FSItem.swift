@@ -35,7 +35,6 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
     /// File folder name (w/o starting paths)
     @Published public var name = ""
     
-    
     @Published public var bytesCompleted: Int  = 0 {
         didSet {
             if !isFolder && size > 0 {
