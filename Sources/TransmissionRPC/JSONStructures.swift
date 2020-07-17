@@ -117,6 +117,52 @@ public struct JSONPeers: Decodable {
  @struct JSONFileStatObject
  Structures to parse the torrent-get RPC JSON response with the fileStats object fields.
  */
+
+
+public struct File: Codable {
+    public var name: String
+    public var length: Int
+    public var bytesCompleted: Int
+    public var pathComponents: [String] = []
+    
+    private enum CodingKeys: String, CodingKey {
+        case name
+        case length
+        case bytesCompleted
+    }
+}
+
+
+public struct JSONFilesObject: Codable {
+    public var files: [File]
+    public var fileStats: [FileStat]
+   
+    
+    private enum CodingKeys: String, CodingKey {
+        case files
+        case fileStats
+    }
+}
+
+public struct JSONFilesArguments: Codable {
+    
+    public var torrents: [JSONFilesObject]
+    
+    private enum CodingKeys: String, CodingKey {
+        case torrents
+    }
+}
+
+public struct JSONFiles: Codable {
+    public var arguments: JSONFilesArguments
+    public var result: String
+    
+    private enum CodingKeys: String, CodingKey {
+        case arguments
+        case result
+    }
+}
+
 public struct JSONFileStatObject: Codable {
     public var fileStats: [FileStat]
    
@@ -125,6 +171,7 @@ public struct JSONFileStatObject: Codable {
         case fileStats
     }
 }
+
 
 public struct JSONFileStatArguments: Codable {
     

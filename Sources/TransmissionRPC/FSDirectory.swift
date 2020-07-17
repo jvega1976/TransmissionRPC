@@ -41,6 +41,9 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
         self.folderItems = [:]
     }
     
+    
+    
+    
     /// Initializer, filling Directory items with JSON objects content
     ///
     /// - parameter files: Array of JSON objects containing file properties
@@ -56,6 +59,28 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             let pathComponents = fullName.components(separatedBy: PATH_SPLITTER_STRING)
             file[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
             rootItem.addPathComponents(withJSONFileInfo: &file, jsonFileStatInfo: fileStats[i], rpcIndex: i)
+        }
+        self.filter()
+        self.sort()
+        rpcIndexFiles = rootItem.rpcFileIndexes
+    }
+    
+    
+    /// Initializer, filling Directory items with JSON objects content
+    ///
+    /// - parameter files: Array of JSON objects containing file properties
+    /// - parameter fileStats: Array of JSON objects containing file statistics
+    /// return: A new FSDirectory object containing all Files for one particular Torrent
+    
+    convenience public init(withFiles files: [File], stats fileStats:[FileStat], andId id: Int) {
+        self.init()
+        self.id = id
+        for i in 0..<files.count {
+            var file = files[i]
+            let fullName = file.name
+            let pathComponents = fullName.components(separatedBy: PATH_SPLITTER_STRING)
+            file.pathComponents = pathComponents
+            rootItem.addPathComponents(withFile: &file, andStat: fileStats[i], rpcIndex: i)
         }
         self.filter()
         self.sort()
@@ -111,14 +136,14 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
     
     public var rpcIndexesLowPriority: [Int] {
         let indexes = rpcIndexFiles.filter { (index, item) in
-            item.priority == .low
+            item.priority == FilePriorityLow
         }
         return Array(indexes.keys)
     }
     
     public var rpcIndexesHighPriority: [Int] {
         let indexes = rpcIndexFiles.filter { (index, item) in
-            item.priority == .high
+            item.priority == FilePriorityHigh
         }
         return Array(indexes.keys)
     }
@@ -130,8 +155,8 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as? Bool) {
                 self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as? Bool
             }
-            if self.rpcIndexFiles[i]?.priorityInteger != (file[JSONKeys.priority] as! Int) {
-                self.rpcIndexFiles[i]?.priorityInteger = file[JSONKeys.priority] as! Int
+            if self.rpcIndexFiles[i]?.priority != (file[JSONKeys.priority] as! FilePriority) {
+                self.rpcIndexFiles[i]?.priority = file[JSONKeys.priority] as! FilePriority
             }
         }
     }
@@ -143,8 +168,8 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             if self.rpcIndexFiles[i]?.isWanted != file.wanted {
                 self.rpcIndexFiles[i]?.isWanted = file.wanted
             }
-            if  self.rpcIndexFiles[i]?.priorityInteger != file.priority {
-                self.rpcIndexFiles[i]?.priorityInteger = file.priority
+            if  self.rpcIndexFiles[i]?.priority != file.priority {
+                self.rpcIndexFiles[i]?.priority = file.priority
             }
         }
     }

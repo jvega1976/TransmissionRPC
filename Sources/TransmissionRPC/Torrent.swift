@@ -51,6 +51,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         case peersSendingToUs = "peersSendingToUs"
         case percentDone = "percentDone"
         case piecesCount = "pieceCount"
+        case pieces = "pieces"
         case pieceSize = "pieceSize"
         case queuePosition = "queuePosition"
         case recheckProgress = "recheckProgress"
@@ -68,6 +69,11 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         case uploadLimited = "uploadLimited"
         case uploadRate = "rateUpload"
         case uploadRatio = "uploadRatio"
+        case trackers = "trackerStats"
+        case peers = "peers"
+        case peersFrom = "peersFrom"
+        case files = "files"
+        case fileStats = "fileStats"
     }
     
     // MARK: - Class Properties
@@ -93,6 +99,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var uploadRatio: Double = 0.0
     @Published public var hashString: String = ""
     @Published public var piecesCount: Int = 0
+    @Published public var pieces: Data = Data()
     @Published public var pieceSize: Int = 0
     @Published public var comment: String = ""
     @Published public var downloadDir: String = ""
@@ -116,6 +123,10 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var queuePosition: Int = 0
     @Published public var eta: Int = 0
     @Published public var haveUnchecked: Int = 0
+    @Published public var trackers: [Tracker] = []
+    @Published public var peers: [Peer] = []
+    @Published public var peersFrom: PeerStat = PeerStat()
+    @Published public var files: FSDirectory = FSDirectory()
     
     // MARK: - Class computed properties
 
@@ -136,7 +147,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public private (set) var detailStatus: String = ""
     @Published public private (set) var peersDetail: String = ""
     @Published public private (set) var statusString: String = ""
-
+    //@Published public private (set) var piecesArray: Array<(offset: Int,element: Bool)> = []
     
     public var id: Int  {
         return self.trId
@@ -189,9 +200,19 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         seedRatioMode = (try? values.decode(Int.self, forKey: .seedRatioMode)) ?? 0
         seedRatioLimit = (try? values.decode(Double.self, forKey: .seedRatioLimit)) ?? 0.0
         queuePosition = (try? values.decode(Int.self, forKey: .queuePosition)) ?? 0
+        pieces = (try? values.decode(Data.self, forKey: .pieces)) ?? Data()
         eta = (try? values.decode(Int.self, forKey: .eta)) ?? 0
         haveUnchecked = (try? values.decode(Int.self, forKey: .haveUnchecked)) ?? 0
-
+        trackers = (try? values.decode([Tracker].self, forKey: .trackers)) ?? []
+        peers = (try? values.decode([Peer].self, forKey: .peers)) ?? []
+        peersFrom = (try? values.decode(PeerStat.self, forKey: .peersFrom)) ?? PeerStat()
+        do {
+            let files = (try? values.decode([File].self, forKey: .files)) ?? []
+            let fileStats = try values.decode([FileStat].self, forKey: .fileStats)
+            self.files = FSDirectory(withFiles: files, stats: fileStats, andId: self.trId)
+        } catch {
+            print(error.localizedDescription)
+        }
         CommonInit()
     
     }
@@ -220,6 +241,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         try container.encode(hashString, forKey: .hashString)
         try container.encode(piecesCount, forKey: .piecesCount)
         try container.encode(pieceSize, forKey: .pieceSize)
+        try container.encode(pieces, forKey: .pieces)
         try container.encode(comment, forKey: .comment)
         try container.encode(downloadDir, forKey: .downloadDir)
         try container.encode(errorNumber, forKey: .errorNumber)
@@ -243,6 +265,9 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         try container.encode(eta, forKey: .eta)
         try container.encode(haveUnchecked, forKey: .haveUnchecked)
         try container.encode(status, forKey: .status)
+        try container.encode(trackers, forKey: .trackers)
+        try container.encode(peers, forKey: .peers)
+        try container.encode(peersFrom, forKey: .peersFrom)
     }
     
     
@@ -346,6 +371,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         }
 
         self.statusString = self.status.statusString
+        //self.piecesArray = self.pieces.bitsAsBool.enumerated().map({$0})
     }
     
     ///
@@ -374,6 +400,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         self.uploadRatio = torrent.uploadRatio
         self.hashString = torrent.hashString
         self.piecesCount = torrent.piecesCount
+        self.pieces = torrent.pieces
         self.pieceSize = torrent.pieceSize
         self.comment = torrent.comment
         self.downloadDir = torrent.downloadDir
@@ -397,6 +424,9 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         self.queuePosition = torrent.queuePosition
         self.eta = torrent.eta
         self.haveUnchecked = torrent.haveUnchecked
+        self.trackers = torrent.trackers
+        self.peers = torrent.peers
+        self.peersFrom = torrent.peersFrom
         self.CommonInit()
     }
     

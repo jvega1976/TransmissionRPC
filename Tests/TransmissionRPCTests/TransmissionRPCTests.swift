@@ -79,19 +79,8 @@ class TransmissionRPCTests: XCTestCase {
         // Put setup code here. This method is called before the invocation of each test method in the class.
         let url = URL(string: "http://jvega:Nmjcup0112*@diskstation.johnnyvega.net:9091/transmission/rpc")
         print(url!.absoluteString)
-        session = try? RPCSession(withURL: url!, andTimeout:10)
-        self.categorization = Categorization()
-        
-        self.session?.getInfo(forTorrents: nil, withPriority: .veryHigh, andCompletionHandler: { torrents,_,error in
-         if error != nil {
-         print(error!.localizedDescription)
-         } else {
-            self.categorization.setItems(torrents!)
-         }
-         self.sema.signal()
-         })
-         sema.wait()
-        
+        guard let session = try? RPCSession(withURL: url!, andTimeout:10) else { assertionFailure(); return }
+        self.session = session
     }
 
     override func tearDown() {
@@ -207,6 +196,25 @@ class TransmissionRPCTests: XCTestCase {
             self.session.addTorrentRequest(request)
             self.sema.wait()
         }
+    }
+    
+    func testFullTorrents() {
+        
+        let sema = DispatchSemaphore(value: 0)
+        
+        session?.getInfo(forTorrents: [227], withPriority: .veryHigh, andCompletionHandler: { torrents, removed, error in
+            DispatchQueue.main.async {
+                if error != nil {
+                    print(error!.localizedDescription)
+                }
+                else {
+                    dump(torrents!)
+                    print("File priotity: \(torrents!.first!.files.rootItem.items!.first!.priority)")
+                }
+            }
+            sema.signal()
+        })
+        sema.wait()
     }
 
     func testPerformanceExample() {

@@ -164,3 +164,22 @@ public extension DateFormatter {
     }
     
 }
+
+
+extension UInt8 {
+    var bitBool: Array<Bool> {
+        var arrayBool = Array(repeating: false, count: 8)
+        for shift in 0...7 {
+            arrayBool[shift] = (self >> shift) & 0x1 != 0 ? true : false
+        }
+        return arrayBool
+    }
+}
+
+extension Data {
+    var bitsAsBool: Array<Bool> {
+        self.reduce(Array<Bool>()) { (boolArray, byte) -> Array<Bool> in
+            return boolArray + byte.bitBool
+        }
+    }
+}

@@ -9,16 +9,31 @@
 import Foundation
 import Combine
 
-public let FSITEM_INDEXNOTFOUND = -1
+public let FilePriorityLow = 0
+public let FilePriorityNormal = 1 /* since NORMAL is 0, memset initializes nicely */
+public let FilePriorityHigh = 2
 
-public enum FilePriority: Int, Codable {
-    case low = 0
-    case normal = 1 /* since NORMAL is 0, memset initializes nicely */
-    case high = 2
-}
+public typealias FilePriority = Int
+
 
 // MARK: - Class FSItem
-public final class FSItem: NSObject, ObservableObject, Identifiable {
+public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
+    
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case name
+        case fullName
+        case bytesCompleted
+        case size
+        case isWanted
+        case priority
+        case downloadProgress
+        case rpcIndex
+        case fsItems
+        case items
+        case level
+        case parent
+    }
+    
     
     public var id: String {
         return fullName
@@ -38,7 +53,7 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
     @Published public var bytesCompleted: Int  = 0 {
         didSet {
             if !isFolder && size > 0 {
-                self.downloadProgress = Float(bytesCompleted) / Float(size)
+                self.downloadProgress = Double(bytesCompleted/size)
             }
             self.bytesCompletedString = ByteCountFormatter.formatByteCount(bytesCompleted)
             guard let parent = self.parent else { return }
@@ -55,7 +70,7 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
     @Published public var size: Int = 0 {
         didSet {
             if size > 0 {
-                downloadProgress = Float(bytesCompleted) / Float(size)
+                downloadProgress = Double(bytesCompleted/size)
             }
             self.sizeString = ByteCountFormatter.formatByteCount(size)
             guard let parent = self.parent else { return }
@@ -97,38 +112,23 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
     
     /// Priority of this file/folder
     
-    @Published public var priority: FilePriority = .normal {
-        didSet {
-            if self.priorityInteger != self.priority.rawValue {
-                self.priorityInteger = self.priority.rawValue
-            }
-            guard let parent = self.parent else { return }
-            parent.priority = parent.fsItems!.contains(where: {$0.priority == .low}) ? .low : (parent.fsItems!.contains(where: {$0.priority == .high}) ? .high : .normal)
-        }
-    }
+    @Published public var priority: FilePriority = FilePriorityNormal
     
-    public var priorityString: String {
+    public var priorityDescription: String {
         switch priority {
-            case .low:
-                return "Low"
-            case .normal:
-                return "Normal"
-            case.high:
-                return "High"
+        case FilePriorityLow:
+            return "Low"
+        case FilePriorityNormal:
+            return "Normal"
+        case FilePriorityHigh:
+            return "High"
+        default:
+            return "Invalid"
         }
     }
-    
-    @Published public var priorityInteger: Int = 0 {
-        didSet {
-            guard let priority = FilePriority(rawValue: self.priorityInteger) ,
-                  self.priority != priority  else { return }
-            self.priority = priority
-        }
-    }
-
-    
+        
     /// Download progress for file/folder (0 ... 1)
-    @Published public var downloadProgress: Float = 0 {
+    @Published public var downloadProgress: Double = 0 {
         didSet {
             self.downloadProgressString = (downloadProgress * 100.0).truncatingRemainder(dividingBy: 1.0)  == 0 ? String(format: "%03.0f%%", downloadProgress * 100.0) : String(format: "%03.2f%%", downloadProgress * 100.0)
         }
@@ -227,6 +227,23 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
         }
     }
     
+    public init(from decoder: Decoder) throws {
+        super.init()
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        name = try values.decode(String.self, forKey: .name)
+        fullName = try values.decode(String.self, forKey: .fullName)
+        bytesCompleted = try values.decode(Int.self, forKey: .bytesCompleted)
+        size = try values.decode(Int.self, forKey: .size)
+        isWanted = try values.decode(Bool.self, forKey: .isWanted)
+        priority = try values.decode(FilePriority.self, forKey: .priority)
+        downloadProgress = try values.decode(Double.self, forKey: .downloadProgress)
+        rpcIndex = try values.decode(Int.self, forKey: .rpcIndex)
+        fsItems = try values.decode([FSItem].self, forKey: .fsItems)
+        items = try values.decode([FSItem].self, forKey: .items)
+        level = try values.decode(Int.self, forKey: .level)
+        parent = try values.decode(FSItem.self, forKey: .parent)
+    }
+    
 
     func sort(by sortPredicate: (FSItem,FSItem)->Bool) {
         if self.isFolder {
@@ -261,6 +278,22 @@ public final class FSItem: NSObject, ObservableObject, Identifiable {
             }
         }
         return nil
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(fullName, forKey: .fullName)
+        try container.encode(bytesCompleted, forKey: .bytesCompleted)
+        try container.encode(size, forKey: .size)
+        try container.encode(isWanted, forKey: .isWanted)
+        try container.encode(priority, forKey: .priority)
+        try container.encode(downloadProgress, forKey: .downloadProgress)
+        try container.encode(rpcIndex, forKey: .rpcIndex)
+        try container.encode(fsItems, forKey: .fsItems)
+        try container.encode(items, forKey: .items)
+        try container.encode(level, forKey: .level)
+        try container.encode(parent, forKey: .parent)
     }
     
 }
@@ -371,12 +404,6 @@ extension FSItem {
             fileInfo[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
             newItem.fullName = (newItem.parent?.fullName ?? "") + (!(newItem.parent?.fullName.isEmpty ?? true) ? "/" : "") + newItem.name
             newItem.addPathComponents(withJSONFileInfo: &fileInfo, jsonFileStatInfo: fileStatInfo, rpcIndex: rpcIndex)
-/*            if newItem.parent!.fullName != "" {
-                newItem.fullName = newItem.parent!.fullName + "/" + newItem.name
-            }
-            else {
-                newItem.fullName = newItem.name
-            }*/
         } else {
             newItem.fullName = fileInfo[JSONKeys.name] as! String
             newItem.rpcIndex = rpcIndex
@@ -385,7 +412,37 @@ extension FSItem {
             newItem.size = size
             newItem.bytesCompleted = bytesCompleted
             newItem.isWanted = fileStatInfo[JSONKeys.wanted] as? Bool
-            newItem.priorityInteger = fileStatInfo[JSONKeys.priority] as? Int ?? 0
+            newItem.priority = fileStatInfo[JSONKeys.priority] as? FilePriority ?? FilePriorityNormal
+        }
+    }
+    
+    public func addPathComponents(withFile fileInfo: inout File, andStat fileStatInfo: FileStat, rpcIndex: Int) {
+        // add all components to the tree (from root){
+        let itemName = fileInfo.pathComponents.removeFirst()
+        
+        // last item in array is file, the others - folders
+        let isFolder = !fileInfo.pathComponents.isEmpty
+        
+        var newItem: FSItem
+        if let item = self.fsItems!.first(where: {$0.name == itemName}) {
+           newItem = item
+        }
+        else {
+            newItem = self.add(withName: itemName, isFolder: isFolder)
+        }
+        
+        if newItem.isFolder {
+            newItem.fullName = (newItem.parent?.fullName ?? "") + (!(newItem.parent?.fullName.isEmpty ?? true) ? "/" : "") + newItem.name
+            newItem.addPathComponents(withFile: &fileInfo, andStat: fileStatInfo, rpcIndex: rpcIndex)
+        } else {
+            newItem.fullName = fileInfo.name
+            newItem.rpcIndex = rpcIndex
+            let bytesCompleted = fileInfo.bytesCompleted
+            let size = fileInfo.length
+            newItem.size = size
+            newItem.bytesCompleted = bytesCompleted
+            newItem.isWanted = fileStatInfo.wanted
+            newItem.priority = fileStatInfo.priority
         }
     }
 }

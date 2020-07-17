@@ -85,6 +85,7 @@ public extension RPCSession {
                 JSONKeys.peersSendingToUs,
                 JSONKeys.percentDone,
                 JSONKeys.pieceCount,
+                JSONKeys.pieces,
                 JSONKeys.pieceSize,
                 JSONKeys.queuePosition,
                 JSONKeys.rateDownload,
@@ -101,7 +102,13 @@ public extension RPCSession {
                 JSONKeys.uploadedEver,
                 JSONKeys.uploadLimit,
                 JSONKeys.uploadLimited,
-                JSONKeys.uploadRatio
+                JSONKeys.uploadRatio,
+                JSONKeys.trackerStats,
+                JSONKeys.peers,
+                JSONKeys.peersFrom,
+                JSONKeys.files,
+                JSONKeys.fileStats,
+                JSONKeys.pieces
             ]
         }
         var arguments = JSONObject()
@@ -231,19 +238,21 @@ public extension RPCSession {
                          JSONKeys.ids: [trId]
             ] as JSONObject
         
-        let request = RPCRequest(forMethod: JSONKeys.torrent_get, withArguments: arguments, usingSession: self, andPriority: queuePriority,  jsonCompletion: { (json,error) in
+        let request = RPCRequest(forMethod: JSONKeys.torrent_get, withArguments: arguments, usingSession: self, andPriority: queuePriority,  dataCompletion: { (data,error) in
                 if error != nil {
                     completion(nil,error)
                     return
                 }
-                let torrentsFiles = (json![JSONKeys.arguments] as! JSONObject)[JSONKeys.torrents] as! [JSONObject]
-                
-                let files = torrentsFiles.first![JSONKeys.files] as? [JSONObject] ?? []
-                let fileStats = torrentsFiles.first![JSONKeys.fileStats] as? [JSONObject] ?? []
-                
-                let fsDir = FSDirectory(withJSONFileInfo: files, jsonFileStatInfo: fileStats, andId: trId)
-                
-                completion(fsDir,nil)
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .secondsSince1970
+                    let response = try decoder.decode(JSONFiles.self, from: data!)
+                    guard let torrentsFiles = response.arguments.torrents.first else {return}
+                    let files = torrentsFiles.files
+                    let fileStats = torrentsFiles.fileStats
+                    let fsDir = FSDirectory(withFiles: files, stats: fileStats, andId: trId)
+                    completion(fsDir,nil)
+                } catch { }
             })
         request.queuePriority = queuePriority
         torrentQueue.addOperation(request)
