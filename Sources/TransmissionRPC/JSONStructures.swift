@@ -121,8 +121,8 @@ public struct JSONPeers: Decodable {
 
 public struct File: Codable {
     public var name: String
-    public var length: Int
-    public var bytesCompleted: Int
+    public var length: Double
+    public var bytesCompleted: Double
     public var pathComponents: [String] = []
     
     private enum CodingKeys: String, CodingKey {
@@ -136,11 +136,12 @@ public struct File: Codable {
 public struct JSONFilesObject: Codable {
     public var files: [File]
     public var fileStats: [FileStat]
-   
+    public var id: TrId
     
     private enum CodingKeys: String, CodingKey {
         case files
         case fileStats
+        case id
     }
 }
 
@@ -163,19 +164,11 @@ public struct JSONFiles: Codable {
     }
 }
 
-public struct JSONFileStatObject: Codable {
-    public var fileStats: [FileStat]
-   
-    
-    private enum CodingKeys: String, CodingKey {
-        case fileStats
-    }
-}
 
 
 public struct JSONFileStatArguments: Codable {
     
-    public var torrents: [JSONFileStatObject]
+    public var torrents: [FileStats]
     
     private enum CodingKeys: String, CodingKey {
         case torrents

@@ -22,26 +22,30 @@ let TR_ARG_FIELDS_FILE_PATHCOMPONENTS = "pathComponents"
 
 //MARK: - FSDirectory structure
 
-open class FSDirectory: NSObject, ObservableObject, Identifiable {
+open class FSDirectory: NSObject, ObservableObject, Identifiable, Codable {
 
     private var folderItems = [AnyHashable : Any]()
     private var rpcIndexFiles = [Int: FSItem]()
     
     
-    @Published public var id: Int
+    @Published public var id: Int = 0
     
     /// Get root FSItem
     @Published public private (set) var rootItem: FSItem
     
     /// Initializer
-    public override init() {
-        self.rootItem = FSItem(name: "", isFolder: true) // init root element (always folder)
-        self.id = 1
+    public init(for trId: TrId? = nil) {
+        self.rootItem = FSItem(fullName: "", isFolder: true) // init root element (always folder)
+        self.id = trId ?? 1
         super.init()
         self.folderItems = [:]
     }
     
-    
+    private enum CodingKeys: String, CodingKey, CaseIterable {
+        case rootItem
+        case id
+        case rpcIndexFiles
+    }
     
     
     /// Initializer, filling Directory items with JSON objects content
@@ -59,6 +63,9 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             let pathComponents = fullName.components(separatedBy: PATH_SPLITTER_STRING)
             file[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
             rootItem.addPathComponents(withJSONFileInfo: &file, jsonFileStatInfo: fileStats[i], rpcIndex: i)
+        }
+        rootItem.items?.forEach { item in
+            item.parent = nil
         }
         self.filter()
         self.sort()
@@ -82,10 +89,29 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
             file.pathComponents = pathComponents
             rootItem.addPathComponents(withFile: &file, andStat: fileStats[i], rpcIndex: i)
         }
+        rootItem.items?.forEach { item in
+            item.parent = nil
+        }
         self.filter()
         self.sort()
         rpcIndexFiles = rootItem.rpcFileIndexes
     }
+    
+    public required init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        id = try values.decode(TrId.self, forKey: .id)
+        rootItem = try values.decode(FSItem.self, forKey: .rootItem)
+        rpcIndexFiles = try values.decode([Int: FSItem].self, forKey: .rpcIndexFiles)
+        super.init()
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(rootItem, forKey: .rootItem)
+        try container.encode(id, forKey: .id)
+        try container.encode(rpcIndexFiles, forKey: .rpcIndexFiles)
+    }
+    
     
     
     /// Sort all folders/files included in directory
@@ -151,7 +177,7 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
     public func updateFSDir(usingStats fileStats:[JSONObject]) {
         for i in 0..<fileStats.count {
             let file = fileStats[i]
-            self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Int)
+            self.rpcIndexFiles[i]?.bytesCompleted = (file[JSONKeys.bytesCompleted] as! Double)
             if self.rpcIndexFiles[i]?.isWanted != (file[JSONKeys.wanted] as? Bool) {
                 self.rpcIndexFiles[i]?.isWanted = file[JSONKeys.wanted] as? Bool
             }
@@ -176,7 +202,15 @@ open class FSDirectory: NSObject, ObservableObject, Identifiable {
     
     public func updateFSDir(with fsDir: FSDirectory) {
         if fsDir.id == self.id {
-            self.rootItem.items = fsDir.rootItem.items
+            if !(rootItem.items!.isEmpty) {
+                for i in 0..<(rootItem.items?.count ?? 0) {
+                    self.rootItem.items![i].update(withFSItem: fsDir.rootItem.items![i])
+                    self.rootItem.items![i].parent = nil
+                }
+            } else {
+                self.rootItem.items!.append(contentsOf: fsDir.rootItem.items!)
+                self.rpcIndexFiles = rootItem.rpcFileIndexes
+            }
         }
     }
     
@@ -234,8 +268,9 @@ extension FSDirectory {
                 levelItem = folderItems[cPath] as! FSItem
                 continue
             }
+            let fullName = (cPath as NSString).substring(to: cPath.count - 1)
             
-            levelItem = levelItem.add(withName: itemName, isFolder: isFolder)
+            levelItem = levelItem.add(withFullName: fullName, isFolder: isFolder)
             
             // cache folder item
             if isFolder {
@@ -244,7 +279,6 @@ extension FSDirectory {
             } else {
                 levelItem.rpcIndex = rpcIndex
             }
-            levelItem.fullName = (cPath as NSString).substring(to: cPath.count - 1)
         }
         rpcIndexFiles = rootItem.rpcFileIndexes
         return levelItem

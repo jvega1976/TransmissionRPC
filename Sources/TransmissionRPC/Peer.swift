@@ -133,7 +133,7 @@ open class Peer: NSObject, Codable, ObservableObject, Identifiable {
         self.port = try values.decode(Int.self, forKey: .port)
         self.progress = try values.decode(Double.self, forKey: .progress)
         self.rateToClient = try values.decode(Int.self, forKey: .rateToClient)
-        self.rateToPeer = try values.decode(Int.self, forKey: .rateToPeer)        
+        self.rateToPeer = try values.decode(Int.self, forKey: .rateToPeer)
     }
     
     

@@ -70,10 +70,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         case uploadRate = "rateUpload"
         case uploadRatio = "uploadRatio"
         case trackers = "trackerStats"
-        case peers = "peers"
-        case peersFrom = "peersFrom"
-        case files = "files"
         case fileStats = "fileStats"
+        case files = "files"
     }
     
     // MARK: - Class Properties
@@ -124,12 +122,10 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public var eta: Int = 0
     @Published public var haveUnchecked: Int = 0
     @Published public var trackers: [Tracker] = []
-    @Published public var peers: [Peer] = []
-    @Published public var peersFrom: PeerStat = PeerStat()
     @Published public var files: FSDirectory = FSDirectory()
+    @Published public var fileStats: [FileStat] = []
     
     // MARK: - Class computed properties
-
     @Published public private (set) var isError: Bool = false
     @Published public private (set) var isDownloading: Bool = false
     @Published public private (set) var isWaiting: Bool = false
@@ -147,7 +143,6 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     @Published public private (set) var detailStatus: String = ""
     @Published public private (set) var peersDetail: String = ""
     @Published public private (set) var statusString: String = ""
-    //@Published public private (set) var piecesArray: Array<(offset: Int,element: Bool)> = []
     
     public var id: Int  {
         return self.trId
@@ -204,17 +199,8 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         eta = (try? values.decode(Int.self, forKey: .eta)) ?? 0
         haveUnchecked = (try? values.decode(Int.self, forKey: .haveUnchecked)) ?? 0
         trackers = (try? values.decode([Tracker].self, forKey: .trackers)) ?? []
-        peers = (try? values.decode([Peer].self, forKey: .peers)) ?? []
-        peersFrom = (try? values.decode(PeerStat.self, forKey: .peersFrom)) ?? PeerStat()
-        do {
-            let files = (try? values.decode([File].self, forKey: .files)) ?? []
-            let fileStats = try values.decode([FileStat].self, forKey: .fileStats)
-            self.files = FSDirectory(withFiles: files, stats: fileStats, andId: self.trId)
-        } catch {
-            print(error.localizedDescription)
-        }
+        fileStats = (try? values.decode([FileStat].self, forKey: .fileStats)) ?? []
         CommonInit()
-    
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -266,8 +252,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         try container.encode(haveUnchecked, forKey: .haveUnchecked)
         try container.encode(status, forKey: .status)
         try container.encode(trackers, forKey: .trackers)
-        try container.encode(peers, forKey: .peers)
-        try container.encode(peersFrom, forKey: .peersFrom)
+        try container.encode(files, forKey: .files)
     }
     
     
@@ -281,6 +266,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
     }
     
     public func CommonInit()->Void {
+    
         self.isError = self.errorString.count > 0 && self.errorNumber != 0
         self.isDownloading = self.status == .download
         self.isWaiting = self.status == .downloadWait || self.status == .seedWait || self.status == .checkWait
@@ -336,9 +322,6 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         
         if isError {
             self.totalSizeString = String(format: NSLocalizedString("%@ of %@, uploaded %@ (Ratio %0.2f)", comment: ""), ByteCountFormatter.formatByteCount(Int(self.downloadedSize)), ByteCountFormatter.formatByteCount(totalSize), ByteCountFormatter.formatByteCount(self.uploadedEver), self.uploadRatio < 0.0 ? 0.0 : self.uploadRatio)
-        }
-        
-        if isError {
             self.detailStatus = NSLocalizedString("Error: \(errorString)", comment: "")
         } else if isSeeding {
             self.detailStatus = self.uploadRateString
@@ -371,7 +354,6 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         }
 
         self.statusString = self.status.statusString
-        //self.piecesArray = self.pieces.bitsAsBool.enumerated().map({$0})
     }
     
     ///
@@ -425,8 +407,7 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         self.eta = torrent.eta
         self.haveUnchecked = torrent.haveUnchecked
         self.trackers = torrent.trackers
-        self.peers = torrent.peers
-        self.peersFrom = torrent.peersFrom
+        self.files.updateFSDir(usingStats: torrent.fileStats)
         self.CommonInit()
     }
     

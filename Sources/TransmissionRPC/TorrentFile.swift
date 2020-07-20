@@ -87,7 +87,7 @@ open class TorrentFile: NSObject {
                             return result + "/" + pathname
                     })
                     let item:FSItem = fs.addFilePath(fileName, andRpcIndex: idx)
-                    item.size = fileDesc[kLengthKey].int!
+                    item.size = Double(fileDesc[kLengthKey].int!)
                     item.isWanted = true
                     item.downloadProgress = 0.0
                     idx += 1
@@ -99,7 +99,7 @@ open class TorrentFile: NSObject {
                 let item = fs.addFilePath(benDict?[kInfoKey][kNameKey].string ?? "", andRpcIndex: 0)
                 item.isWanted = true
                 item.downloadProgress = 0.0
-                item.size = info?[kLengthKey].int ?? 0
+                item.size = Double(info?[kLengthKey].int ?? 0)
                 
             }
             

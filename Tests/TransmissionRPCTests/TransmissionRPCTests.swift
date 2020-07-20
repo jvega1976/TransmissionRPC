@@ -202,7 +202,7 @@ class TransmissionRPCTests: XCTestCase {
         
         let sema = DispatchSemaphore(value: 0)
         
-        session?.getInfo(forTorrents: [227], withPriority: .veryHigh, andCompletionHandler: { torrents, removed, error in
+        session?.getInfo(forTorrents: [258], withPriority: .veryHigh, andCompletionHandler: { torrents, removed, error in
             DispatchQueue.main.async {
                 if error != nil {
                     print(error!.localizedDescription)

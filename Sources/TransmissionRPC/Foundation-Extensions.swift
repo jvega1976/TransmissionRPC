@@ -83,11 +83,32 @@ public extension ByteCountFormatter {
         return formatByteCountFormatter.string(fromByteCount: Int64(byteCount))
     }
     
+    /// Converts a byte count value into a localized description that is formatted with the appropriate byte modifier (KB, MB, GB and so on).
+    ///
+    /// - parameter byteCount: Bytes count to convert
+    ///
+    class func formatByteCount(_ byteCount: Double = 0.0) -> String {
+        
+        if byteCount == 0 {
+            return "0 KB"
+        }
+        
+        return formatByteCountFormatter.string(fromByteCount: Int64(byteCount))
+    }
+    
     /// Converts a byte count per seconds value into a localized description that is formatted with the appropriate byte modifier (KB/s, MB/s, GB/s and so on)
     ///
     /// - parameter bytesPerSeconds: Bytes count to convert
     ///
     class func formatByteRate(_ bytesPerSeconds: Int = 0) -> String {
+        return "\(formatByteCount(bytesPerSeconds))/s"
+    }
+    
+    /// Converts a byte count per seconds value into a localized description that is formatted with the appropriate byte modifier (KB/s, MB/s, GB/s and so on)
+    ///
+    /// - parameter bytesPerSeconds: Bytes count to convert
+    ///
+    class func formatByteRate(_ bytesPerSeconds: Double = 0.0) -> String {
         return "\(formatByteCount(bytesPerSeconds))/s"
     }
     
@@ -176,10 +197,45 @@ extension UInt8 {
     }
 }
 
-extension Data {
+
+public extension Data {
+    
     var bitsAsBool: Array<Bool> {
         self.reduce(Array<Bool>()) { (boolArray, byte) -> Array<Bool> in
             return boolArray + byte.bitBool
+        }
+    }
+    
+    var bitMap: Array<(index:Int,bit:Bool)> {
+        let arrayBool = self.withUnsafeBytes { pointer -> Array<(index: Int, bit: Bool)> in
+            var array:Array<(index: Int, bit: Bool)> = []
+            for i in 0..<self.count {
+                let vakue = pointer[i]
+                for shift in 0...7 {
+                    let index = i * 8 + shift
+                    array.append((index,(vakue >> shift) & 0x1 != 0 ? true : false))
+                }
+            }
+            return array
+        }
+        return arrayBool
+    }
+}
+
+
+extension Array where Self.Element == (index:Int,bit:Bool) {
+    
+    mutating func updateBitMap<T>(with data: T) where T: ContiguousBytes {
+        data.withUnsafeBytes { pointer -> Void in
+           // var array:Array<(index: Int, bit: Bool)> = []
+            for i in 0..<self.count {
+                let value = pointer[i]
+                for shift in 0...7 {
+                    let index = i * 8 + shift
+                    self[index] = (index,(value >> shift) & 0x1 != 0 ? true : false)
+                    //array.append((index,(vakue >> shift) & 0x1 != 0 ? true : false))
+                }
+            }
         }
     }
 }

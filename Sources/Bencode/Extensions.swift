@@ -18,7 +18,7 @@ internal extension Sequence where Iterator.Element == Byte {
             else { return nil }
         return Int(string)
     }
-    
+        
     var string: String? {
         return String(bytes: self, encoding: .ascii)
     }

@@ -35,9 +35,7 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
     }
     
     
-    public var id: String {
-        return fullName
-    }
+    @Published public var id: String = ""
     
     /// Returns YES if this is a folder
     public var isFolder: Bool {
@@ -45,17 +43,21 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
     }
     
     /// File name including path
-    @Published public var fullName = ""
+    @Published public var fullName = "" {
+        didSet {
+            self.name = (self.fullName as NSString).lastPathComponent
+        }
+    }
     
     /// File folder name (w/o starting paths)
     @Published public var name = ""
     
-    @Published public var bytesCompleted: Int  = 0 {
+    @Published public var bytesCompleted: Double  = 0 {
         didSet {
             if !isFolder && size > 0 {
-                self.downloadProgress = Double(bytesCompleted/size)
+                self.downloadProgress = bytesCompleted/size
             }
-            self.bytesCompletedString = ByteCountFormatter.formatByteCount(bytesCompleted)
+            self.bytesCompletedString = ByteCountFormatter.formatByteCount(Int(bytesCompleted))
             guard let parent = self.parent else { return }
             parent.bytesCompleted = parent.fsItems!.reduce(0, { x, y in
                 x + y.bytesCompleted })
@@ -67,12 +69,12 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
     
     
     /// Total size of file/folder
-    @Published public var size: Int = 0 {
+    @Published public var size: Double = 0 {
         didSet {
             if size > 0 {
-                downloadProgress = Double(bytesCompleted/size)
+                downloadProgress = bytesCompleted/size
             }
-            self.sizeString = ByteCountFormatter.formatByteCount(size)
+            self.sizeString = ByteCountFormatter.formatByteCount(Int(size))
             guard let parent = self.parent else { return }
             parent.size = parent.fsItems!.reduce(0, { size, item in
                 size + (item.isFolder || (item.isWanted ?? false) ? item.size : 0) })
@@ -127,6 +129,7 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
         }
     }
         
+
     /// Download progress for file/folder (0 ... 1)
     @Published public var downloadProgress: Double = 0 {
         didSet {
@@ -184,9 +187,8 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
     @Published public var parent: FSItem? = nil
     
     /// Add new item to folder item
-    public func add(withName name: String, isFolder: Bool) -> FSItem {
-        let item = FSItem(name: name, isFolder: isFolder)
-        
+    public func add(withFullName name: String, isFolder: Bool) -> FSItem {
+        let item = FSItem(fullName: name, isFolder: isFolder)
         item.level = self.level + 1
         item.parent = self
         fsItems!.append(item)
@@ -195,10 +197,11 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
     }
 
     
-    public init(name: String, isFolder: Bool) {
+    public init(fullName: String, isFolder: Bool) {
         super.init()
         self.level = 0
-        self.name = name
+        self.fullName = fullName
+        self.id = fullName
         self.size = 0
         self.sizeString = ""
         self.bytesCompleted = 0
@@ -216,7 +219,8 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
     public override init() {
         super.init()
         self.level = 0
-        self.name = ""
+        self.fullName = ""
+        self.id = ""
         self.size = 0
         self.bytesCompleted = 0
         self.sizeString = ""
@@ -232,8 +236,8 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         name = try values.decode(String.self, forKey: .name)
         fullName = try values.decode(String.self, forKey: .fullName)
-        bytesCompleted = try values.decode(Int.self, forKey: .bytesCompleted)
-        size = try values.decode(Int.self, forKey: .size)
+        bytesCompleted = try values.decode(Double.self, forKey: .bytesCompleted)
+        size = try values.decode(Double.self, forKey: .size)
         isWanted = try values.decode(Bool.self, forKey: .isWanted)
         priority = try values.decode(FilePriority.self, forKey: .priority)
         downloadProgress = try values.decode(Double.self, forKey: .downloadProgress)
@@ -244,6 +248,15 @@ public final class FSItem: NSObject, ObservableObject, Identifiable, Codable {
         parent = try values.decode(FSItem.self, forKey: .parent)
     }
     
+    public func update(withFSItem item: FSItem) {
+        self.fullName = item.fullName
+        self.size = item.size
+        self.bytesCompleted = item.bytesCompleted
+        self.priority = item.priority
+        self.isWanted = item.isWanted
+        self.items = item.items
+        self.fsItems = item.fsItems
+    }
 
     func sort(by sortPredicate: (FSItem,FSItem)->Bool) {
         if self.isFolder {
@@ -391,24 +404,22 @@ extension FSItem {
         
         // last item in array is file, the others - folders
         let isFolder = !pathComponents.isEmpty
-        
+        let fullName = isFolder ? (self.fullName + (!self.fullName.isEmpty ? "/" : "") + itemName) : fileInfo[JSONKeys.name] as! String
         var newItem: FSItem
-        if let item = self.fsItems!.first(where: {$0.name == itemName}) {
+        if let item = self.fsItems!.first(where: {$0.fullName == fullName}) {
            newItem = item
         }
         else {
-            newItem = self.add(withName: itemName, isFolder: isFolder)
+            newItem = self.add(withFullName: fullName, isFolder: isFolder)
         }
         
         if newItem.isFolder {
             fileInfo[TR_ARG_FIELDS_FILE_PATHCOMPONENTS] = pathComponents
-            newItem.fullName = (newItem.parent?.fullName ?? "") + (!(newItem.parent?.fullName.isEmpty ?? true) ? "/" : "") + newItem.name
             newItem.addPathComponents(withJSONFileInfo: &fileInfo, jsonFileStatInfo: fileStatInfo, rpcIndex: rpcIndex)
         } else {
-            newItem.fullName = fileInfo[JSONKeys.name] as! String
             newItem.rpcIndex = rpcIndex
-            let bytesCompleted = fileInfo[JSONKeys.bytesCompleted] as! Int
-            let size = fileInfo[JSONKeys.length] as! Int
+            let bytesCompleted = fileInfo[JSONKeys.bytesCompleted] as! Double
+            let size = fileInfo[JSONKeys.length] as! Double
             newItem.size = size
             newItem.bytesCompleted = bytesCompleted
             newItem.isWanted = fileStatInfo[JSONKeys.wanted] as? Bool
@@ -422,25 +433,21 @@ extension FSItem {
         
         // last item in array is file, the others - folders
         let isFolder = !fileInfo.pathComponents.isEmpty
-        
+        let fullName = isFolder ? (self.fullName + (!self.fullName.isEmpty ? "/" : "") + itemName) : fileInfo.name
         var newItem: FSItem
-        if let item = self.fsItems!.first(where: {$0.name == itemName}) {
+        if let item = self.fsItems!.first(where: {$0.fullName == fullName}) {
            newItem = item
         }
         else {
-            newItem = self.add(withName: itemName, isFolder: isFolder)
+            newItem = self.add(withFullName: fullName, isFolder: isFolder)
         }
         
         if newItem.isFolder {
-            newItem.fullName = (newItem.parent?.fullName ?? "") + (!(newItem.parent?.fullName.isEmpty ?? true) ? "/" : "") + newItem.name
             newItem.addPathComponents(withFile: &fileInfo, andStat: fileStatInfo, rpcIndex: rpcIndex)
         } else {
-            newItem.fullName = fileInfo.name
             newItem.rpcIndex = rpcIndex
-            let bytesCompleted = fileInfo.bytesCompleted
-            let size = fileInfo.length
-            newItem.size = size
-            newItem.bytesCompleted = bytesCompleted
+            newItem.size = fileInfo.length
+            newItem.bytesCompleted = fileStatInfo.bytesCompleted
             newItem.isWanted = fileStatInfo.wanted
             newItem.priority = fileStatInfo.priority
         }

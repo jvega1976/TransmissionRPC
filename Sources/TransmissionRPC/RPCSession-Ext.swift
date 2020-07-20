@@ -104,10 +104,8 @@ public extension RPCSession {
                 JSONKeys.uploadLimited,
                 JSONKeys.uploadRatio,
                 JSONKeys.trackerStats,
-                JSONKeys.peers,
-                JSONKeys.peersFrom,
-                JSONKeys.files,
                 JSONKeys.fileStats,
+                JSONKeys.files,
                 JSONKeys.pieces
             ]
         }
@@ -231,27 +229,32 @@ public extension RPCSession {
     ///     A FSDirectory object containing the torrent's file in a hierarchy structure
     /// - parameter error:
     ///     An error object that indicates why the request failed, or nil if the request was successful.
-    func getAllFiles(forTorrent trId: TrId, withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ fsDir: FSDirectory?,_ error: Error?)->Void) {
+    func getAllFiles(forTorrent trId: [TrId], withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ fsDir: [FSDirectory],_ error: Error?)->Void) {
         
-        let arguments = [JSONKeys.fields: [JSONKeys.files,
+        let arguments = [JSONKeys.fields: [JSONKeys.id,
+                                           JSONKeys.files,
                                            JSONKeys.fileStats],
-                         JSONKeys.ids: [trId]
+                         JSONKeys.ids: trId
             ] as JSONObject
         
         let request = RPCRequest(forMethod: JSONKeys.torrent_get, withArguments: arguments, usingSession: self, andPriority: queuePriority,  dataCompletion: { (data,error) in
                 if error != nil {
-                    completion(nil,error)
+                    completion([],error)
                     return
                 }
                 do {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .secondsSince1970
                     let response = try decoder.decode(JSONFiles.self, from: data!)
-                    guard let torrentsFiles = response.arguments.torrents.first else {return}
-                    let files = torrentsFiles.files
-                    let fileStats = torrentsFiles.fileStats
-                    let fsDir = FSDirectory(withFiles: files, stats: fileStats, andId: trId)
-                    completion(fsDir,nil)
+                    let torrentsFiles = response.arguments.torrents
+                    var fsDirs = [FSDirectory]()
+                    torrentsFiles.forEach { torrent in
+                        let files = torrent.files
+                        let fileStats = torrent.fileStats
+                        let fsDir = FSDirectory(withFiles: files, stats: fileStats, andId: torrent.id)
+                        fsDirs.append(fsDir)
+                    }
+                    completion(fsDirs,nil)
                 } catch { }
             })
         request.queuePriority = queuePriority
@@ -271,25 +274,25 @@ public extension RPCSession {
     ///     A FSDirectory object containing the torrent's file in a hierarchy structure
     /// - parameter error:
     ///     An error object that indicates why the request failed, or nil if the request was successful.
-    func getAllFileStats(forTorrent trId: TrId, withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ stats:[FileStat]?,_ error: Error?)->Void) {
+    func getAllFileStats(forTorrent trId: [TrId], withPriority queuePriority: Operation.QueuePriority = .normal, completionHandler completion: @escaping(_ stats:[FileStats],_ error: Error?)->Void) {
         
-        let arguments = [JSONKeys.fields: [JSONKeys.fileStats],
-                         JSONKeys.ids: [trId]
+        let arguments = [JSONKeys.fields: [JSONKeys.id, JSONKeys.fileStats],
+                         JSONKeys.ids: trId
             ] as JSONObject
         
         let request = RPCRequest(forMethod: JSONKeys.torrent_get, withArguments: arguments, usingSession: self, andPriority: queuePriority,  dataCompletion: { (data,error) in
                 if error != nil {
-                    completion(nil,error)
+                    completion([],error)
                     return
                 }
                 do {
                     let decoder = JSONDecoder()
                     decoder.dateDecodingStrategy = .secondsSince1970
                     let response = try decoder.decode(JSONFileStat.self, from: data!)
-                    let fileStats = response.arguments.torrents.first!.fileStats
+                    let fileStats = response.arguments.torrents
                     completion(fileStats,nil)
                 } catch {
-                    completion(nil, error)
+                    completion([], error)
                 }
             })
         request.queuePriority = queuePriority

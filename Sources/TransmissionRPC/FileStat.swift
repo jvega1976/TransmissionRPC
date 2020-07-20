@@ -12,17 +12,23 @@ import Foundation
 
 public struct FileStat: Codable {
 
-    public var bytesCompleted: Int = 0
+    public var bytesCompleted: Double = 0
     public var wanted : Bool = false
     public var priority: FilePriority
 
-    public var bytesCompletedString: String {
-        return ByteCountFormatter.formatByteCount(bytesCompleted)
-    }
-    
     private enum CodingKeys: String, CodingKey {
         case bytesCompleted
         case wanted
         case priority
+    }
+}
+
+public struct FileStats: Codable {
+    public var trId: TrId
+    public var fileStats: [FileStat]
+    
+    private enum CodingKeys: String, CodingKey {
+        case trId = "id"
+        case fileStats
     }
 }
