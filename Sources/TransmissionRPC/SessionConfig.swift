@@ -10,36 +10,6 @@ import Foundation
 import Combine
 
 
-/*public struct AltDays
-{
-    public static var Sunday = 1 << 0
-    public static var Monday = 1 << 1
-    public static var Tuesday = 1 << 2
-    public static var Wednesday = 1 << 3
-    public static var Thursday = 1 << 4
-    public static var Friday = 1 << 5
-    public static var Saturday = 1 << 6
-    public static var Weekday = AltDays.Monday | AltDays.Tuesday | AltDays.Wednesday | AltDays.Thursday | AltDays.Friday
-    public static var Weekend = AltDays.Sunday | AltDays.Saturday
-    public static var All = AltDays.Sunday | AltDays.Monday | AltDays.Tuesday | AltDays.Wednesday | AltDays.Thursday | AltDays.Friday | AltDays.Saturday
-    
-    public static func day(_ i: Int) -> Int {
-        switch i {
-            case 0..<7:
-                return 1 << i
-            case 7:
-                return Weekend
-            case 8:
-                return Weekday
-            case 9:
-                return All
-            default:
-                return 0
-        }
-    }
-}
-*/
-
 //MARK: - SessionConfig struct definition
 open class SessionConfig: NSObject, Codable, ObservableObject {
     
@@ -344,174 +314,7 @@ open class SessionConfig: NSObject, Codable, ObservableObject {
         self.encryptionInt = session.encryptionInt
     }
     
-    /*
-    private func fillSelectedDays() -> [Bool] {
-        var selected = [Bool]()
-        for i in 0..<10 {
-            selected.insert(self.altSpeedTimeDay == AltDays.day(i),at: i)
-        }
-        return selected
-    }
-
-    
-
-    
-    
-    open var altLimitSun: Bool {
-        get {
-            return selectedDays[0]
-        }
-        set {
-            selectedDays[0] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var altLimitMon: Bool {
-        get {
-            return selectedDays[1]
-        }
-        set {
-            selectedDays[1] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var altLimitTue: Bool {
-        get {
-            return selectedDays[2]
-        }
-        set {
-            selectedDays[2] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var altLimitWed: Bool {
-        get {
-            return selectedDays[3]
-        }
-        set {
-            selectedDays[3] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var altLimitThu: Bool {
-        get {
-            return selectedDays[4]
-        }
-        set {
-            selectedDays[4] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var altLimitFri: Bool {
-        get {
-            return selectedDays[5]
-        }
-        set {
-            selectedDays[5] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var altLimitSat: Bool {
-        get {
-            return selectedDays[6]
-        }
-        set {
-            selectedDays[6] = newValue
-            calculateAltDay()
-        }
-    }
-    
-    open var altLimitWeekend: Bool {
-        get {
-            return selectedDays[7]
-        }
-        set {
-            selectedDays[7] = newValue
-            calculateAltDay()
-        }
-    }
-    
-    open var altLimitWeekday: Bool {
-        get {
-            return selectedDays[8]
-        }
-        set {
-            selectedDays[8] = newValue
-            calculateAltDay()
-        }
-    }
-    
-    open var altLimitAll: Bool {
-        get {
-            return selectedDays[9]
-        }
-        set {
-            selectedDays[9] = newValue
-            calculateAltDay()
-        }
-    }
-
-    
-    open var limitTimeBegin: Date? {
-        get {
-
-            let c = Calendar.current
-            var cp: DateComponents = c.dateComponents([.nanosecond], from: Date())
-            cp.hour = altSpeedTimeBegin
-            cp.minute = altSpeedTimeBegin
-
-            return c.date(from: cp)
-        }
-        set(limitTimeBegin) {
-            let dt = limitTimeBegin
-
-            let cal = Calendar.current
-            var c: DateComponents? = nil
-            if(dt != nil){
-                c = cal.dateComponents([.hour, .minute], from: dt!)
-            }
-
-            altSpeedTimeBegin = c!.hour! * 60 + c!.minute!
-        }
-    }
-
-    
-    open var limitTimeEnd: Date? {
-        get {
-            let c = Calendar.current
-            var cp: DateComponents = c.dateComponents([.nanosecond], from: Date())
-            cp.hour = altSpeedTimeEnd
-            cp.minute = altSpeedTimeEnd
-
-            return c.date(from: cp)
-        }
-        set(limitTimeEnd) {
-
-            let dt = limitTimeEnd
-
-            let cal = Calendar.current
-            var c: DateComponents? = nil
-            if (dt != nil) {
-                c = cal.dateComponents([.hour, .minute], from: dt!)
-            }
-
-            altSpeedTimeEnd = c!.hour! * 60 + c!.minute!
-        }
-    }
-    */
-    
+   
     open var jsonForRPC: JSONObject {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .millisecondsSince1970
@@ -519,9 +322,7 @@ open class SessionConfig: NSObject, Codable, ObservableObject {
         var rpcMessage = JSONObject()
         do {
             let data = try encoder.encode(self)
-            //print(String(data: data, encoding: .utf8) ?? "")
             rpcMessage = try JSONSerialization.jsonObject(with: data, options: []) as! JSONObject
-            //dump(json)
         } catch {
             return JSONObject()
         }

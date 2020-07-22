@@ -200,6 +200,9 @@ open class Torrent: NSObject, Codable, ObservableObject, Identifiable  {
         haveUnchecked = (try? values.decode(Int.self, forKey: .haveUnchecked)) ?? 0
         trackers = (try? values.decode([Tracker].self, forKey: .trackers)) ?? []
         fileStats = (try? values.decode([FileStat].self, forKey: .fileStats)) ?? []
+        if let files = try? values.decode([File].self, forKey: .files) {
+            self.files = FSDirectory(withFiles: files, stats: fileStats, andId: trId)
+        }
         CommonInit()
     }
     
